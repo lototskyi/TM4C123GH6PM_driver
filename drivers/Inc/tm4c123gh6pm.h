@@ -8,6 +8,10 @@
 #ifndef DRIVERS_INC_TM4C123GH6PM_H_
 #define DRIVERS_INC_TM4C123GH6PM_H_
 
+#include <stdint.h>
+
+#define __vo                        volatile
+
 /*
  * base addresses of flash and SRAM memories
  */
@@ -58,5 +62,54 @@
 #define UART5_BASEADDR              0x40011000U
 #define UART6_BASEADDR              0x40012000U
 #define UART7_BASEADDR              0x40013000U
+
+
+/***********************************peripheral register definition structures******************************************/
+
+typedef struct {
+    __vo uint32_t DATA;                              /* GPIO Data :                                  0x000*/
+    __vo uint32_t DATA_BIT_MASK[255];                /* Bit mask */
+    __vo uint32_t DIR;                               /* GPIO Direction :                             0x400*/
+    __vo uint32_t IS;                                /* GPIO Interrupt Sense :                       0x404 */
+    __vo uint32_t IBE;                               /* GPIO Interrupt Both Edges :                  0x408 */
+    __vo uint32_t IEV;                               /* GPIO Interrupt Event :                       0x40C */
+    __vo uint32_t IM;                                /* GPIO Interrupt Mask :                        0x410 */
+    __vo uint32_t RIS;                               /* GPIO Raw Interrupt Status :                  0x414 */
+    __vo uint32_t MIS;                               /* GPIO Masked Interrupt Status :               0x418 */
+    __vo uint32_t ICR;                               /* GPIO Interrupt Clear :                       0x41C */
+    __vo uint32_t AFSEL;                             /* GPIO Alternate Function Select :             0x420 */
+    uint32_t reserved_0[55];
+    __vo uint32_t DR2R;                              /* GPIO 2-mA Drive Select :                     0x500 */
+    __vo uint32_t DR4R;                              /* GPIO 4-mA Drive Select :                     0x504 */
+    __vo uint32_t DR8R;                              /* GPIO 8-mA Drive Select :                     0x508 */
+    __vo uint32_t ODR;                               /* GPIO Open Drain Select :                     0x50C */
+    __vo uint32_t PUR;                               /* GPIO Pull-Up Select :                        0x510 */
+    __vo uint32_t PDR;                               /* GPIO Pull-Down Select :                      0x514 */
+    __vo uint32_t SLR;                               /* GPIO Slew Rate Control Select :              0x518 */
+    __vo uint32_t DEN;                               /* GPIO Digital Enable :                        0x51C */
+    __vo uint32_t LOCK;                              /* GPIO Lock :                                  0x520 */
+    __vo uint32_t CR;                                /* GPIO Commit :                                0x524 */
+    __vo uint32_t AMSEL;                             /* GPIO Analog Mode Select :                    0x528 */
+    __vo uint32_t PCTL;                              /* GPIO Port Control :                          0x52C */
+    __vo uint32_t ADCCTL;                            /* GPIO ADC Control :                           0x530 */
+    __vo uint32_t DMACTL;                            /* GPIO DMA Control :                           0x534 */
+    uint32_t reserved_1[678];
+    __vo uint32_t PeriphID4;                         /* GPIO Peripheral Identification 4 :           0xFD0 */
+    __vo uint32_t PeriphID5;                         /* GPIO Peripheral Identification 5 :           0xFD4 */
+    __vo uint32_t PeriphID6;                         /* GPIO Peripheral Identification 6 :           0xFD8 */
+    __vo uint32_t PeriphID7;                         /* GPIO Peripheral Identification 7 :           0xFDC */
+    __vo uint32_t PeriphID0;                         /* GPIO Peripheral Identification 0 :           0xFE0 */
+    __vo uint32_t PeriphID1;                         /* GPIO Peripheral Identification 1 :           0xFE4 */
+    __vo uint32_t PeriphID2;                         /* GPIO Peripheral Identification 2 :           0xFE8 */
+    __vo uint32_t PeriphID3;                         /* GPIO Peripheral Identification 3 :           0xFEC */
+    __vo uint32_t PCellID0;                          /* GPIO PrimeCell Identification 0 :            0xFF0 */
+    __vo uint32_t PCellID1;                          /* GPIO PrimeCell Identification 1 :            0xFF4 */
+    __vo uint32_t PCellID2;                          /* GPIO PrimeCell Identification 2 :            0xFF8 */
+    __vo uint32_t PCellID3;                          /* GPIO PrimeCell Identification 3 :            0xFFC */
+} GPIO_RegDef_t;
+
+
+
+
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_H_ */
