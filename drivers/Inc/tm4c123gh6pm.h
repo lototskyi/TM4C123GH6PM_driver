@@ -63,6 +63,13 @@
 #define UART6_BASEADDR              0x40012000U
 #define UART7_BASEADDR              0x40013000U
 
+#define SCR_BASE_ADDR                0x400FE000UL
+
+/* System Control Register */
+#define SCR_RCC                      ( (uint32_t*) (SCR_BASE_ADDR + 0x060) )      /* Run-Mode Clock Configuration :                                   0x060 */
+#define SCR_MOSCCTL                  ( (uint32_t*) (SCR_BASE_ADDR + 0x07C) )      /* Main Oscillator Control :                                        0x07c */
+#define SCR_RCGCGPIO                 ( (uint32_t*) (SCR_BASE_ADDR + 0x608) )      /* General-Purpose Input/Output Run Mode Clock Gating Control :     0x608 */
+
 
 /***********************************peripheral register definition structures******************************************/
 
@@ -109,7 +116,21 @@ typedef struct {
 } GPIO_RegDef_t;
 
 
+/**
+ * peripheral definitions (Peripheral base addresses typecasted to xxx_RegDef_t)
+ */
+#define GPIOA_APB                  ( (GPIO_RegDef_t*) GPIOA_APB_BASEADDR )
+#define GPIOB_APB                  ( (GPIO_RegDef_t*) GPIOB_APB_BASEADDR )
+#define GPIOC_APB                  ( (GPIO_RegDef_t*) GPIOC_APB_BASEADDR )
+#define GPIOD_APB                  ( (GPIO_RegDef_t*) GPIOD_APB_BASEADDR )
+#define GPIOE_APB                  ( (GPIO_RegDef_t*) GPIOE_APB_BASEADDR )
+#define GPIOF_APB                  ( (GPIO_RegDef_t*) GPIOF_APB_BASEADDR )
 
-
+#define GPIOA_AHB                  ( (GPIO_RegDef_t*) GPIOA_AHB_BASEADDR )
+#define GPIOB_AHB                  ( (GPIO_RegDef_t*) GPIOB_AHB_BASEADDR )
+#define GPIOC_AHB                  ( (GPIO_RegDef_t*) GPIOC_AHB_BASEADDR )
+#define GPIOD_AHB                  ( (GPIO_RegDef_t*) GPIOD_AHB_BASEADDR )
+#define GPIOE_AHB                  ( (GPIO_RegDef_t*) GPIOE_AHB_BASEADDR )
+#define GPIOF_AHB                  ( (GPIO_RegDef_t*) GPIOF_AHB_BASEADDR )
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_H_ */
