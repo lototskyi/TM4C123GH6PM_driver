@@ -12,6 +12,13 @@
 
 #define __vo                        volatile
 
+#define ENABLE                      1
+#define DISABLE                     0
+#define SET                         ENABLE
+#define RESET                       DISABLE
+#define GPIO_PIN_SET                SET
+#define GPIO_PIN_RESET              RESET
+
 /*
  * base addresses of flash and SRAM memories
  */
@@ -68,8 +75,92 @@
 /* System Control Register */
 #define SCR_RCC                      ( (uint32_t*) (SCR_BASE_ADDR + 0x060) )      /* Run-Mode Clock Configuration :                                   0x060 */
 #define SCR_MOSCCTL                  ( (uint32_t*) (SCR_BASE_ADDR + 0x07C) )      /* Main Oscillator Control :                                        0x07c */
-#define SCR_RCGCGPIO                 ( (uint32_t*) (SCR_BASE_ADDR + 0x608) )      /* General-Purpose Input/Output Run Mode Clock Gating Control :     0x608 */
 
+//GPIO related system control registers
+#define SCR_SRGPIO                   ( (uint32_t*) (SCR_BASE_ADDR + 0x508) )      /* General-Purpose Input/Output Software Reset :                    0x508 */
+#define SCR_RCGCGPIO                 ( (uint32_t*) (SCR_BASE_ADDR + 0x608) )      /* General-Purpose Input/Output Run Mode Clock Gating Control :     0x608 */
+#define SRC_PRGPIO                   ( (uint32_t*) (SCR_BASE_ADDR + 0xA08) )      /* General-Purpose Input/Output Peripheral Ready :                  0xa08 */
+
+#define SCR_RCGCI2C                  ( (uint32_t*) (SCR_BASE_ADDR + 0x620) )      /* Inter-Integrated Circuit Run Mode Clock Gating Control :         0x620 */
+#define SCR_RCGCSSI                  ( (uint32_t*) (SCR_BASE_ADDR + 0x61C) )      /* Synchronous Serial Interface Run Mode Clock Gating Control :     0x61c */
+#define SCR_RCGCUART                 ( (uint32_t*) (SCR_BASE_ADDR + 0x618) )      /* Universal Asynchronous Receiver/Transmitter Run Mode Clock Gating Control : 0x618 */
+
+/*
+ * Clock Enable Macros for GPIOx peripherals
+ */
+#define GPIOA_PCLK_RUN_EN()         ( *SCR_RCGCGPIO |= (1 << 0) )
+#define GPIOB_PCLK_RUN_EN()         ( *SCR_RCGCGPIO |= (1 << 1) )
+#define GPIOC_PCLK_RUN_EN()         ( *SCR_RCGCGPIO |= (1 << 2) )
+#define GPIOD_PCLK_RUN_EN()         ( *SCR_RCGCGPIO |= (1 << 3) )
+#define GPIOE_PCLK_RUN_EN()         ( *SCR_RCGCGPIO |= (1 << 4) )
+#define GPIOF_PCLK_RUN_EN()         ( *SCR_RCGCGPIO |= (1 << 5) )
+
+/*
+ * Clock Enable Macros for I2Cx peripherals
+ */
+#define I2C0_PCLK_RUN_EN()          ( *SCR_RCGCI2C |= (1 << 0) )
+#define I2C1_PCLK_RUN_EN()          ( *SCR_RCGCI2C |= (1 << 1) )
+#define I2C2_PCLK_RUN_EN()          ( *SCR_RCGCI2C |= (1 << 2) )
+#define I2C3_PCLK_RUN_EN()          ( *SCR_RCGCI2C |= (1 << 3) )
+
+/*
+ * Clock Enable Macros for SPIx peripherals
+ */
+#define SSI0_PCLK_RUN_EN()          ( *SCR_RCGCSSI |= (1 << 0) )
+#define SSI1_PCLK_RUN_EN()          ( *SCR_RCGCSSI |= (1 << 1) )
+#define SSI2_PCLK_RUN_EN()          ( *SCR_RCGCSSI |= (1 << 2) )
+#define SSI3_PCLK_RUN_EN()          ( *SCR_RCGCSSI |= (1 << 3) )
+
+/*
+ * Clock Enable Macros for UARTx peripherals
+ */
+#define UART0_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 0) )
+#define UART1_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 1) )
+#define UART2_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 2) )
+#define UART3_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 3) )
+#define UART4_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 4) )
+#define UART5_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 5) )
+#define UART6_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 6) )
+#define UART7_PCLK_RUN_EN()         ( *SCR_RCGCUART |= (1 << 7) )
+
+
+/*
+ * Clock Disable Macros for GPIOx peripherals
+ */
+#define GPIOA_PCLK_RUN_DI()         ( *SCR_RCGCGPIO &= ~(1 << 0) )
+#define GPIOB_PCLK_RUN_DI()         ( *SCR_RCGCGPIO &= ~(1 << 1) )
+#define GPIOC_PCLK_RUN_DI()         ( *SCR_RCGCGPIO &= ~(1 << 2) )
+#define GPIOD_PCLK_RUN_DI()         ( *SCR_RCGCGPIO &= ~(1 << 3) )
+#define GPIOE_PCLK_RUN_DI()         ( *SCR_RCGCGPIO &= ~(1 << 4) )
+#define GPIOF_PCLK_RUN_DI()         ( *SCR_RCGCGPIO &= ~(1 << 5) )
+
+/*
+ * Clock Disable Macros for I2Cx peripherals
+ */
+#define I2C0_PCLK_RUN_DI()          ( *SCR_RCGCI2C &= ~(1 << 0) )
+#define I2C1_PCLK_RUN_DI()          ( *SCR_RCGCI2C &= ~(1 << 1) )
+#define I2C2_PCLK_RUN_DI()          ( *SCR_RCGCI2C &= ~(1 << 2) )
+#define I2C3_PCLK_RUN_DI()          ( *SCR_RCGCI2C &= ~(1 << 3) )
+
+/*
+ * Clock Disable Macros for SPIx peripherals
+ */
+#define SSI0_PCLK_RUN_DI()          ( *SCR_RCGCSSI &= ~(1 << 0) )
+#define SSI1_PCLK_RUN_DI()          ( *SCR_RCGCSSI &= ~(1 << 1) )
+#define SSI2_PCLK_RUN_DI()          ( *SCR_RCGCSSI &= ~(1 << 2) )
+#define SSI3_PCLK_RUN_DI()          ( *SCR_RCGCSSI &= ~(1 << 3) )
+
+/*
+ * Clock Disable Macros for UARTx peripherals
+ */
+#define UART0_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 0) )
+#define UART1_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 1) )
+#define UART2_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 2) )
+#define UART3_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 3) )
+#define UART4_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 4) )
+#define UART5_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 5) )
+#define UART6_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 6) )
+#define UART7_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 7) )
 
 /***********************************peripheral register definition structures******************************************/
 
