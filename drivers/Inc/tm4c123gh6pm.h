@@ -19,6 +19,55 @@
 #define GPIO_PIN_SET                SET
 #define GPIO_PIN_RESET              RESET
 
+/************************** START: Processor Specific Details **********************************/
+
+/*
+ * ARM Cortex Mx Processor NVIC ISERx register Addresses
+ */
+
+#define NVIC_ISER0                  ( (__vo uint32_t*)0xE000E100 )
+#define NVIC_ISER1                  ( (__vo uint32_t*)0xE000E104 )
+#define NVIC_ISER2                  ( (__vo uint32_t*)0xE000E108 )
+#define NVIC_ISER3                  ( (__vo uint32_t*)0xE000E10C )
+#define NVIC_ISER4                  ( (__vo uint32_t*)0xE000E110 )
+
+
+/*
+ * ARM Cortex Mx Processor NVIC ICERx register Addresses
+ */
+
+#define NVIC_ICER0                  ( (__vo uint32_t*)0xE000E180 )
+#define NVIC_ICER1                  ( (__vo uint32_t*)0xE000E184 )
+#define NVIC_ICER2                  ( (__vo uint32_t*)0xE000E188 )
+#define NVIC_ICER3                  ( (__vo uint32_t*)0xE000E18C )
+#define NVIC_ICER4                  ( (__vo uint32_t*)0xE000E190 )
+
+/*
+ * ARM Cortex Mx Processor Priority register Addresses Calculation
+ */
+
+#define NVIC_PR_BASE_ADDR           ( (__vo uint32_t*)0xE000E400 )
+
+/************************** STOP: Processor Specific Details **********************************/
+
+#define NO_PR_BITS_IMPLEMENTED      3
+
+#define IRQ_NO_GPIOA                0
+#define IRQ_NO_GPIOB                1
+#define IRQ_NO_GPIOC                2
+#define IRQ_NO_GPIOD                3
+#define IRQ_NO_GPIOE                4
+#define IRQ_NO_GPIOF                30
+
+#define NVIC_IRQ_PRI0               0
+#define NVIC_IRQ_PRI1               1
+#define NVIC_IRQ_PRI2               2
+#define NVIC_IRQ_PRI3               3
+#define NVIC_IRQ_PRI4               4
+#define NVIC_IRQ_PRI5               5
+#define NVIC_IRQ_PRI6               6
+#define NVIC_IRQ_PRI7               7
+
 /*
  * base addresses of flash and SRAM memories
  */
@@ -73,17 +122,18 @@
 #define SCR_BASE_ADDR                0x400FE000UL
 
 /* System Control Register */
-#define SCR_RCC                      ( (uint32_t*) (SCR_BASE_ADDR + 0x060) )      /* Run-Mode Clock Configuration :                                   0x060 */
-#define SCR_MOSCCTL                  ( (uint32_t*) (SCR_BASE_ADDR + 0x07C) )      /* Main Oscillator Control :                                        0x07c */
+#define SCR_RCC                      ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x060) )      /* Run-Mode Clock Configuration :                                   0x060 */
+#define SCR_MOSCCTL                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x07C) )      /* Main Oscillator Control :                                        0x07c */
 
 //GPIO related system control registers
-#define SCR_SRGPIO                   ( (uint32_t*) (SCR_BASE_ADDR + 0x508) )      /* General-Purpose Input/Output Software Reset :                    0x508 */
-#define SCR_RCGCGPIO                 ( (uint32_t*) (SCR_BASE_ADDR + 0x608) )      /* General-Purpose Input/Output Run Mode Clock Gating Control :     0x608 */
-#define SRC_PRGPIO                   ( (uint32_t*) (SCR_BASE_ADDR + 0xA08) )      /* General-Purpose Input/Output Peripheral Ready :                  0xa08 */
+#define SCR_GPIOHBCTL                ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x06C) )      /* GPIO High-Performance Bus Control :                              0x06c */
+#define SCR_SRGPIO                   ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x508) )      /* General-Purpose Input/Output Software Reset :                    0x508 */
+#define SCR_RCGCGPIO                 ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x608) )      /* General-Purpose Input/Output Run Mode Clock Gating Control :     0x608 */
+#define SRC_PRGPIO                   ( (__vo uint32_t*) (SCR_BASE_ADDR + 0xA08) )      /* General-Purpose Input/Output Peripheral Ready :                  0xa08 */
 
-#define SCR_RCGCI2C                  ( (uint32_t*) (SCR_BASE_ADDR + 0x620) )      /* Inter-Integrated Circuit Run Mode Clock Gating Control :         0x620 */
-#define SCR_RCGCSSI                  ( (uint32_t*) (SCR_BASE_ADDR + 0x61C) )      /* Synchronous Serial Interface Run Mode Clock Gating Control :     0x61c */
-#define SCR_RCGCUART                 ( (uint32_t*) (SCR_BASE_ADDR + 0x618) )      /* Universal Asynchronous Receiver/Transmitter Run Mode Clock Gating Control : 0x618 */
+#define SCR_RCGCI2C                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x620) )      /* Inter-Integrated Circuit Run Mode Clock Gating Control :         0x620 */
+#define SCR_RCGCSSI                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x61C) )      /* Synchronous Serial Interface Run Mode Clock Gating Control :     0x61c */
+#define SCR_RCGCUART                 ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x618) )      /* Universal Asynchronous Receiver/Transmitter Run Mode Clock Gating Control : 0x618 */
 
 /*
  * Clock Enable Macros for GPIOx peripherals
@@ -223,5 +273,7 @@ typedef struct {
 #define GPIOD_AHB                  ( (GPIO_RegDef_t*) GPIOD_AHB_BASEADDR )
 #define GPIOE_AHB                  ( (GPIO_RegDef_t*) GPIOE_AHB_BASEADDR )
 #define GPIOF_AHB                  ( (GPIO_RegDef_t*) GPIOF_AHB_BASEADDR )
+
+#include "tm4c123gh6pm_gpio_driver.h"
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_H_ */
