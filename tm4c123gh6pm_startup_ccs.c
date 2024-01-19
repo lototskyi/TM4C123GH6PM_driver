@@ -301,12 +301,12 @@ IntDefaultHandler(void)
     }
 }
 
-//void GPIOF_Handler(void)
-//{
-//    //
-//    // Go into an infinite loop.
-//    //
-//    while(1)
-//    {
-//    }
-//}
+__attribute__((weak)) void GPIOF_Handler(void)
+{
+    //
+    // Go into an infinite loop.
+    //
+    while(1)
+    {
+    }
+}
