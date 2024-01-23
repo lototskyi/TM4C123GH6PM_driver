@@ -121,9 +121,21 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
 
 void Gpio_DeInit(GPIO_Handle_t *pGPIOHandle)
 {
-    __vo uint32_t *scrSRGPIO = SCR_SRGPIO;
-    *scrSRGPIO |= (1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
-    *scrSRGPIO &= ~(1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+    GPIO_RegDef_t *pGPIOx = pGPIOHandle->pGPIOx;
+
+    if (pGPIOx == GPIOA_APB || pGPIOx == GPIOA_AHB) {
+        GPIOA_REG_RESET();
+    } else if (pGPIOx == GPIOB_APB || pGPIOx == GPIOB_AHB) {
+        GPIOB_REG_RESET();
+    } else if (pGPIOx == GPIOC_APB || pGPIOx == GPIOC_AHB) {
+        GPIOC_REG_RESET();
+    } else if (pGPIOx == GPIOD_APB || pGPIOx == GPIOD_AHB) {
+        GPIOD_REG_RESET();
+    } else if (pGPIOx == GPIOE_APB || pGPIOx == GPIOE_AHB) {
+        GPIOE_REG_RESET();
+    } else if (pGPIOx == GPIOF_APB || pGPIOx == GPIOF_AHB) {
+        GPIOF_REG_RESET();
+    }
 }
 
 uint8_t GPIO_ReadFromInputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber)

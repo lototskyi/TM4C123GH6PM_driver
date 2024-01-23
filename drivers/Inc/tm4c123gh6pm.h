@@ -132,7 +132,10 @@
 #define SRC_PRGPIO                   ( (__vo uint32_t*) (SCR_BASE_ADDR + 0xA08) )      /* General-Purpose Input/Output Peripheral Ready :                  0xa08 */
 
 #define SCR_RCGCI2C                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x620) )      /* Inter-Integrated Circuit Run Mode Clock Gating Control :         0x620 */
+
 #define SCR_RCGCSSI                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x61C) )      /* Synchronous Serial Interface Run Mode Clock Gating Control :     0x61c */
+#define SCR_SRSSI                    ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x51C) )      /* Synchronous Serial Interface Software Reset :                    0x51c */
+
 #define SCR_RCGCUART                 ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x618) )      /* Universal Asynchronous Receiver/Transmitter Run Mode Clock Gating Control : 0x618 */
 
 /*
@@ -212,6 +215,34 @@
 #define UART6_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 6) )
 #define UART7_PCLK_RUN_DI()         ( *SCR_RCGCUART &= ~(1 << 7) )
 
+/*
+ * Macros to reset GPIOx peripherals
+ */
+#define GPIOA_REG_RESET()           ( *SCR_SRGPIO |=  (1 << 0) );\
+                                    ( *SCR_SRGPIO &= ~(1 << 0) )
+#define GPIOB_REG_RESET()           ( *SCR_SRGPIO |=  (1 << 1) );\
+                                    ( *SCR_SRGPIO &= ~(1 << 1) )
+#define GPIOC_REG_RESET()           ( *SCR_SRGPIO |=  (1 << 2) );\
+                                    ( *SCR_SRGPIO &= ~(1 << 2) )
+#define GPIOD_REG_RESET()           ( *SCR_SRGPIO |=  (1 << 3) );\
+                                    ( *SCR_SRGPIO &= ~(1 << 3) )
+#define GPIOE_REG_RESET()           ( *SCR_SRGPIO |=  (1 << 4) );\
+                                    ( *SCR_SRGPIO &= ~(1 << 4) )
+#define GPIOF_REG_RESET()           ( *SCR_SRGPIO |=  (1 << 5) );\
+                                    ( *SCR_SRGPIO &= ~(1 << 5) )
+/*
+ * Macros to reset SSIx peripherals
+ */
+#define SSI0_REG_RESET()            ( *SCR_SRSSI |=  (1 << 0) );\
+                                    ( *SCR_SRSSI &= ~(1 << 0) )
+#define SSI1_REG_RESET()            ( *SCR_SRSSI |=  (1 << 1) );\
+                                    ( *SCR_SRSSI &= ~(1 << 1) )
+#define SSI2_REG_RESET()            ( *SCR_SRSSI |=  (1 << 2) );\
+                                    ( *SCR_SRSSI &= ~(1 << 2) )
+#define SSI3_REG_RESET()            ( *SCR_SRSSI |=  (1 << 3) );\
+                                    ( *SCR_SRSSI &= ~(1 << 3) )
+
+
 /***********************************peripheral register definition structures******************************************/
 
 typedef struct {
@@ -274,6 +305,41 @@ typedef struct {
 #define GPIOE_AHB                  ( (GPIO_RegDef_t*) GPIOE_AHB_BASEADDR )
 #define GPIOF_AHB                  ( (GPIO_RegDef_t*) GPIOF_AHB_BASEADDR )
 
+
+typedef struct {
+    __vo uint32_t CR0;                              /* SSI Control 0 :                              0x000 */
+    __vo uint32_t CR1;                              /* SSI Control 1 :                              0x004 */
+    __vo uint32_t DR;                               /* SSI Data :                                   0x008 */
+    __vo uint32_t SR;                               /* SSI Status :                                 0x00C */
+    __vo uint32_t CPSR;                             /* SSI Clock Prescaler :                        0x010 */
+    __vo uint32_t IM;                               /* SSI Interrupt Mask :                         0x014 */
+    __vo uint32_t RIS;                              /* SSI Interrupt Status :                       0x018 */
+    __vo uint32_t MIS;                              /* SSI Masked Interrupt Status :                0x01C */
+    __vo uint32_t ICR;                              /* SSI Interrupt Clear :                        0x020 */
+    __vo uint32_t DMACTL;                           /* SSI DMA Control :                            0x024 */
+    uint32_t reserved_0[1000];
+    __vo uint32_t CC;                               /* SSI Clock Configuration :                    0xFC8 */
+    uint32_t reserved_1;
+    __vo uint32_t PeriphID4;                        /* SSI Peripheral Identification 4 :            0xFD0 */
+    __vo uint32_t PeriphID5;                        /* SSI Peripheral Identification 5 :            0xFD4 */
+    __vo uint32_t PeriphID6;                        /* SSI Peripheral Identification 6 :            0xFD8 */
+    __vo uint32_t PeriphID7;                        /* SSI Peripheral Identification 7 :            0xFDC */
+    __vo uint32_t PeriphID0;                        /* SSI Peripheral Identification 0 :            0xFE0 */
+    __vo uint32_t PeriphID1;                        /* SSI Peripheral Identification 1 :            0xFE4 */
+    __vo uint32_t PeriphID2;                        /* SSI Peripheral Identification 2 :            0xFE8 */
+    __vo uint32_t PeriphID3;                        /* SSI Peripheral Identification 3 :            0xFEC */
+    __vo uint32_t PCellID0;                         /* SSI PrimeCell Identification 0 :             0xFF0 */
+    __vo uint32_t PCellID1;                         /* SSI PrimeCell Identification 1 :             0xFF4 */
+    __vo uint32_t PCellID2;                         /* SSI PrimeCell Identification 2 :             0xFF8 */
+    __vo uint32_t PCellID3;                         /* SSI PrimeCell Identification 3 :             0xFFC */
+} SSI_RegDef_t;
+
+#define SSI0                       ( (SSI_RegDef_t*) SSI0_BASEADDR )
+#define SSI1                       ( (SSI_RegDef_t*) SSI1_BASEADDR )
+#define SSI2                       ( (SSI_RegDef_t*) SSI2_BASEADDR )
+#define SSI3                       ( (SSI_RegDef_t*) SSI3_BASEADDR )
+
 #include "tm4c123gh6pm_gpio_driver.h"
+#include "tm4c123gh6pm_ssi_driver.h"
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_H_ */
