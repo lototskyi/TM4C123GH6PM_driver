@@ -339,6 +339,52 @@ typedef struct {
 #define SSI2                       ( (SSI_RegDef_t*) SSI2_BASEADDR )
 #define SSI3                       ( (SSI_RegDef_t*) SSI3_BASEADDR )
 
+
+/******************************************************************************************************************
+ * Bit position definitions of SSI peripheral
+ ******************************************************************************************************************/
+#define SSICR0_DSS                 0
+#define SSICR0_FRF                 4
+#define SSICR0_SPO                 6
+#define SSICR0_SPH                 7
+#define SSICR0_SCR                 8
+
+#define SSICR1_LBM                 0
+#define SSICR1_SSE                 1
+#define SSICR1_MS                  2
+#define SSICR1_EOT                 4
+
+#define SSISR_TFE                  0
+#define SSISR_TNF                  1
+#define SSISR_RNE                  2
+#define SSISR_RFF                  3
+#define SSISR_BSY                  4
+
+#define SSICPSR_CPSDVSR            0
+
+#define SSIIM_RORIM                0
+#define SSIIM_RTIM                 1
+#define SSIIM_RXIM                 2
+#define SSIIM_TXIM                 3
+
+#define SSIRIS_RORRIS              0
+#define SSIRIS_RTRIS               1
+#define SSIRIS_RXRIS               2
+#define SSIRIS_TXRIS               3
+
+#define SSIMIS_RORMIS              0
+#define SSIMIS_RTMIS               1
+#define SSIMIS_RXMIS               2
+#define SSIMIS_TXMIS               3
+
+#define SSIICR_RORIC               0
+#define SSIICR_RTIC                1
+
+#define SSIDMACTL_RXDMAE           0
+#define SSIDMACTL_TXDMAE           1
+
+#define SSICC_CS                   0
+
 #include "tm4c123gh6pm_gpio_driver.h"
 #include "tm4c123gh6pm_ssi_driver.h"
 
