@@ -67,7 +67,8 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
     const uint8_t outputType    = pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType;
     const uint8_t altFunc       = pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFunMode;
 
-
+    //enable the peripheral clock
+    GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
 
     //1. configure the mode of gpio pin
     if (pinMode == GPIO_MODE_IN) {

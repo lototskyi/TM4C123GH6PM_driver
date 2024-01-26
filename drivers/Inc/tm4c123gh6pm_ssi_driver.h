@@ -87,7 +87,17 @@ typedef struct {
 #define SSI_SPH_LOW                                         0
 #define SSI_SPH_HIGH                                        1
 
+
+/*
+ * SSI related status flags definitions
+ */
+#define SSI_TFE_FLAG                                        ( 1 << SSISR_TFE )
+#define SSI_RNE_FLAG                                        ( 1 << SSISR_RNE )
+#define SSI_BSY_FLAG                                        ( 1 << SSISR_BSY )
+
 void SSI_PeriClockControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi);
+
+void SSI_PeripheralControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi);
 
 void SSI_Init(SSI_Handle_t *pSSIHandle);
 void SSI_DeInit(SSI_Handle_t *pSSIHandle);

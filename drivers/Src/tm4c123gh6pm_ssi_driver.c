@@ -30,6 +30,9 @@ void SSI_PeriClockControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi)
 
 void SSI_Init(SSI_Handle_t *pSSIHandle)
 {
+    //enable the peripheral clock
+    SSI_PeriClockControl(pSSIHandle->pSSIx, ENABLE);
+
     //1. configure frame format
     const uint8_t frameFormat = pSSIHandle->SSIConfig.SSI_FRF;
 
@@ -101,8 +104,6 @@ void SSI_Init(SSI_Handle_t *pSSIHandle)
         pSSIHandle->pSSIx->CR1 &= ~(1 << SSICR1_LBM);
     }
 
-    //8. serial port enable
-    pSSIHandle->pSSIx->CR1 |= (1 << SSICR1_SSE);
 }
 
 void SSI_DeInit(SSI_Handle_t *pSSIHandle)
@@ -118,9 +119,44 @@ void SSI_DeInit(SSI_Handle_t *pSSIHandle)
     }
 }
 
+void SSI_PeripheralControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi)
+{
+    if (EnOrDi == ENABLE) {
+        pSSIx->CR1 |= (1 << SSICR1_SSE);
+    } else {
+        pSSIx->CR1 &= ~(1 << SSICR1_SSE);
+    }
+}
+
+uint8_t SSI_GetFlagStatus(SSI_RegDef_t *pSSIx, uint32_t FlagName)
+{
+    if (pSSIx->SR & FlagName) {
+        return FLAG_SET;
+    }
+
+    return FLAG_RESET;
+}
+
 void SSI_SendData(SSI_RegDef_t *pSSIx, uint8_t *pTxBuffer, uint32_t Len)
 {
+    while (Len > 0) {
 
+        //1. wait until TFE is set
+        while (SSI_GetFlagStatus(pSSIx, SSI_TFE_FLAG) == FLAG_RESET);
+
+        //2. check if data size is more than 8 bits
+        if ((pSSIx->CR0 & 0xF) > SSI_DSS_8BITS) {
+            pSSIx->DR = *((uint16_t*)pTxBuffer);
+            Len--;
+            Len--;
+            (uint16_t*)pTxBuffer++;
+        } else {
+            pSSIx->DR = *pTxBuffer;
+            Len--;
+            pTxBuffer++;
+        }
+
+    }
 }
 
 void SSI_ReceiveData(SSI_RegDef_t *pSSIx, uint8_t *pRxBuffer, uint32_t Len)
