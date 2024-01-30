@@ -109,4 +109,6 @@ void SSI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnOrDi);
 void SSI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
 void SSI_IRQHandling(SSI_RegDef_t *pSSIx);
 
+uint8_t SSI_GetFlagStatus(SSI_RegDef_t *pSSIx, uint32_t FlagName);
+
 #endif /* DRIVERS_INC_TM4C123GH6PM_SSI_DRIVER_H_ */

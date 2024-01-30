@@ -161,7 +161,24 @@ void SSI_SendData(SSI_RegDef_t *pSSIx, uint8_t *pTxBuffer, uint32_t Len)
 
 void SSI_ReceiveData(SSI_RegDef_t *pSSIx, uint8_t *pRxBuffer, uint32_t Len)
 {
+    while (Len > 0) {
 
+        //1. wait until buffer is not empty
+        while (SSI_GetFlagStatus(pSSIx, SSI_RNE_FLAG) == FLAG_RESET);
+
+        //2. check if data size is more than 8 bits
+        if ((pSSIx->CR0 & 0xF) > SSI_DSS_8BITS) {
+            *((uint16_t*)pRxBuffer) = pSSIx->DR;
+            Len--;
+            Len--;
+            (uint16_t*)pRxBuffer++;
+        } else {
+            *pRxBuffer = pSSIx->DR;
+            Len--;
+            pRxBuffer++;
+        }
+
+    }
 }
 
 void SSI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnOrDi)

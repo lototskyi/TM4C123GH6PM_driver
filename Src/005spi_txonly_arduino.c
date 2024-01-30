@@ -8,6 +8,12 @@
  * Alt func 2
  */
 
+void delay(void)
+{
+    uint32_t i;
+    for(i = 0; i < 500000/2; i++);
+}
+
 void SSI1_GPIOInits(void)
 {
     GPIO_Handle_t SSIPins;
@@ -16,7 +22,7 @@ void SSI1_GPIOInits(void)
     SSIPins.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
     SSIPins.GPIO_PinConfig.GPIO_PinAltFunMode = 2;
     SSIPins.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
-    SSIPins.GPIO_PinConfig.GPIO_PinPinPuPdControl = GPIO_NO_PUPD;
+    SSIPins.GPIO_PinConfig.GPIO_PinPinPuPdControl = GPIO_PIN_PU;
 
     //SCLK
     SSIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_0;
@@ -41,12 +47,24 @@ void SSI1_Inits(void)
     SSI1Handle.pSSIx = SSI1;
     SSI1Handle.SSIConfig.SSI_FRF = FREESCALE_SPI_FRAME_FORMAT;
     SSI1Handle.SSIConfig.SSI_DeviceMode = SSI_DEVICE_MODE_MASTER;
-    SSI1Handle.SSIConfig.SSI_ClkSpeed = SSI_SCLK_SPEED_DIV2;
+    SSI1Handle.SSIConfig.SSI_ClkSpeed = SSI_SCLK_SPEED_DIV8;
     SSI1Handle.SSIConfig.SSI_DSS = SSI_DSS_8BITS;
     SSI1Handle.SSIConfig.SSI_SPO = SSI_SPO_LOW;
     SSI1Handle.SSIConfig.SSI_SPH = SSI_SPH_LOW;
 
     SSI_Init(&SSI1Handle);
+}
+
+void GPIO_ButtonInit(void)
+{
+    GPIO_Handle_t gpioBtn;
+
+    gpioBtn.pGPIOx = GPIOF_AHB;
+    gpioBtn.GPIO_PinConfig.GPIO_PinNumber           = GPIO_PIN_NO_4;
+    gpioBtn.GPIO_PinConfig.GPIO_PinMode             = GPIO_MODE_IN;
+    gpioBtn.GPIO_PinConfig.GPIO_PinPinPuPdControl   = GPIO_PIN_PU;
+
+    GPIO_Init(&gpioBtn);
 }
 
 int main(void)
@@ -61,19 +79,35 @@ int main(void)
 
     char user_data[] = "Hello world!";
 
+    GPIO_ButtonInit();
+
     SSI1_GPIOInits();
     SSI1_Inits();
 
-    SSI_PeripheralControl(SSI1, ENABLE);
+    while(1) {
+        while( GPIO_ReadFromInputPin(GPIOF_AHB, GPIO_PIN_NO_4) );
 
-    SSI_SendData(SSI1, (uint8_t*)user_data, strlen(user_data));
+        delay();
 
-    while( SSI_GetFlagStatus(SSI1, SSI_BSY_FLAG) );
+        SSI_PeripheralControl(SSI1, ENABLE);
 
-    SSI_PeripheralControl(SSI1, DISABLE);
+        //send size of data
+        uint8_t datalen = strlen(user_data);
 
-    while(1);
+        SSI_SendData(SSI1, &datalen, 1);
+
+        SSI_SendData(SSI1, (uint8_t*)user_data, strlen(user_data));
+
+        while( SSI_GetFlagStatus(SSI1, SSI_BSY_FLAG) );
+
+        SSI_PeripheralControl(SSI1, DISABLE);
+    }
+
 
     return 0;
 }
+
+
+
+
 
