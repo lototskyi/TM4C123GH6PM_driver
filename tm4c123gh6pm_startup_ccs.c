@@ -35,6 +35,7 @@ static void FaultISR(void);
 static void IntDefaultHandler(void);
 
 void GPIOF_Handler(void);
+void SSI1_Handler(void);
 
 //*****************************************************************************
 //
@@ -119,7 +120,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // GPIO Port G
     IntDefaultHandler,                      // GPIO Port H
     IntDefaultHandler,                      // UART2 Rx and Tx
-    IntDefaultHandler,                      // SSI1 Rx and Tx
+    SSI1_Handler,                           // SSI1 Rx and Tx
     IntDefaultHandler,                      // Timer 3 subtimer A
     IntDefaultHandler,                      // Timer 3 subtimer B
     IntDefaultHandler,                      // I2C1 Master and Slave
@@ -302,6 +303,16 @@ IntDefaultHandler(void)
 }
 
 __attribute__((weak)) void GPIOF_Handler(void)
+{
+    //
+    // Go into an infinite loop.
+    //
+    while(1)
+    {
+    }
+}
+
+__attribute__((weak)) void SSI1_Handler(void)
 {
     //
     // Go into an infinite loop.

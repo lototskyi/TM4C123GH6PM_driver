@@ -2,6 +2,10 @@
 
 #include "tm4c123gh6pm_ssi_driver.h"
 
+static void ssi_txe_interrupt_handle(SSI_Handle_t *pSSIHandle);
+static void ssi_rxe_interrupt_handle(SSI_Handle_t *pSSIHandle);
+static void ssi_rvr_error_interrupt_handle(SSI_Handle_t *pSSIHandle);
+
 void SSI_PeriClockControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi)
 {
     if (EnOrDi == ENABLE) {
@@ -104,6 +108,8 @@ void SSI_Init(SSI_Handle_t *pSSIHandle)
         pSSIHandle->pSSIx->CR1 &= ~(1 << SSICR1_LBM);
     }
 
+//    pSSIHandle->pSSIx->CR1 |= (1 << SSICR1_EOT);
+
 }
 
 void SSI_DeInit(SSI_Handle_t *pSSIHandle)
@@ -183,15 +189,194 @@ void SSI_ReceiveData(SSI_RegDef_t *pSSIx, uint8_t *pRxBuffer, uint32_t Len)
 
 void SSI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnOrDi)
 {
+    uint8_t IRQBitNumber = (uint8_t)(IRQNumber % 32);
 
+    if (EnOrDi == ENABLE) {
+        if (IRQNumber <= 31) {
+            //EN0
+            *NVIC_ISER0 |= (1 << IRQBitNumber);
+        } else if (IRQNumber > 31 && IRQNumber < 64) {
+            //EN1
+            *NVIC_ISER1 |= (1 << IRQBitNumber);
+        } else if (IRQNumber >= 64 && IRQNumber < 96) {
+            //EN2
+            *NVIC_ISER2 |= (1 << IRQBitNumber);
+        } else if (IRQNumber >= 96 && IRQNumber < 128) {
+            //EN3
+            *NVIC_ISER3 |= (1 << IRQBitNumber);
+        } else if (IRQNumber >= 127 && IRQNumber <= 138) {
+            //EN4
+            *NVIC_ISER4 |= (1 << IRQBitNumber);
+        }
+    } else {
+        if (IRQNumber <= 31) {
+            //EN0
+            *NVIC_ICER0 |= (1 << IRQBitNumber);
+        } else if (IRQNumber > 31 && IRQNumber < 64) {
+            //EN1
+            *NVIC_ICER1 |= (1 << IRQBitNumber);
+        } else if (IRQNumber >= 64 && IRQNumber < 96) {
+            //EN2
+            *NVIC_ICER2 |= (1 << IRQBitNumber);
+        } else if (IRQNumber >= 96 && IRQNumber < 128) {
+            //EN3
+            *NVIC_ICER3 |= (1 << IRQBitNumber);
+        } else if (IRQNumber >= 127 && IRQNumber <= 138) {
+            //EN4
+            *NVIC_ICER4 |= (1 << IRQBitNumber);
+        }
+    }
 }
 
 void SSI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
 {
+    uint8_t iprx = IRQNumber / 4;
+    uint8_t iprx_section = IRQNumber % 4;
+
+    uint8_t shift_amount = (8 * iprx_section) + (8 - NO_PR_BITS_IMPLEMENTED);
+    *(NVIC_PR_BASE_ADDR + iprx) |= ( IRQPriority << shift_amount );
+}
+
+uint8_t SSI_SendDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pTxBuffer, uint32_t Len)
+{
+    uint8_t state = pSSIHandle->TxState;
+
+    if (state != SSI_BUSY_IN_TX) {
+        pSSIHandle->pTxBuffer = pTxBuffer;
+        pSSIHandle->TxLen = Len;
+
+        pSSIHandle->TxState = SSI_BUSY_IN_TX;
+
+        pSSIHandle->pSSIx->IM |= (1 << SSIIM_TXIM);
+    }
+
+    return state;
+}
+
+uint8_t SSI_ReceiveDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pRxBuffer, uint32_t Len)
+{
+    uint8_t state = pSSIHandle->RxState;
+
+    if (state != SSI_BUSY_IN_RX) {
+        pSSIHandle->pRxBuffer = pRxBuffer;
+        pSSIHandle->RxLen = Len;
+
+        pSSIHandle->RxState = SSI_BUSY_IN_RX;
+
+        pSSIHandle->pSSIx->IM |= (1 << SSIIM_RXIM);
+    }
+
+    return state;
+}
+
+void SSI_IRQHandling(SSI_Handle_t *pSSIHandle)
+{
+    uint8_t Ris, Mis;
+
+    Mis = pSSIHandle->pSSIx->MIS & ( 1 << SSIMIS_TXMIS );
+    //Ris = pSSIHandle->pSSIx->RIS & ( 1 << SSIRIS_TXRIS );
+
+    if (Mis) {
+        //handle TXE
+        ssi_txe_interrupt_handle(pSSIHandle);
+    }
+
+//    Mis = pSSIHandle->pSSIx->MIS & ( 1 << SSIMIS_RXMIS );
+//    //Ris = pSSIHandle->pSSIx->RIS & ( 1 << SSIRIS_RXRIS );
+//
+//    if (Mis) {
+//        //handle RXE
+//        ssi_rxe_interrupt_handle(pSSIHandle);
+//    }
+
+    //OVERRUN
+    Mis = pSSIHandle->pSSIx->MIS & ( 1 << SSIMIS_RORMIS );
+    //Ris = pSSIHandle->pSSIx->RIS & ( 1 << SSIRIS_RORRIS );
+
+    if (Mis) {
+        //handle overrun
+        ssi_rvr_error_interrupt_handle(pSSIHandle);
+    }
 
 }
 
-void SSI_IRQHandling(SSI_RegDef_t *pSSIx)
+//helper function implementations
+
+static void ssi_txe_interrupt_handle(SSI_Handle_t *pSSIHandle)
+{
+    if (pSSIHandle->TxLen != 0) {
+        if ((pSSIHandle->pSSIx->CR0 & 0xF) > SSI_DSS_8BITS) {
+            pSSIHandle->pSSIx->DR = *((uint16_t*)pSSIHandle->pTxBuffer);
+            pSSIHandle->TxLen--;
+            pSSIHandle->TxLen--;
+            (uint16_t*)pSSIHandle->pTxBuffer++;
+        } else {
+            pSSIHandle->pSSIx->DR = *pSSIHandle->pTxBuffer;
+            pSSIHandle->TxLen--;
+            pSSIHandle->pTxBuffer++;
+        }
+    } else {
+        //disable interrupt
+        SSI_CloseTransmission(pSSIHandle);
+
+        SSI_ApplicationEventCallback(pSSIHandle, SSI_EVENT_TX_CMPLT);
+    }
+}
+
+static void ssi_rxe_interrupt_handle(SSI_Handle_t *pSSIHandle)
+{
+    if ((pSSIHandle->pSSIx->CR0 & 0xF) > SSI_DSS_8BITS) {
+        *((uint16_t*)pSSIHandle->pRxBuffer) = pSSIHandle->pSSIx->DR;
+        pSSIHandle->RxLen--;
+        pSSIHandle->RxLen--;
+        (uint16_t*)pSSIHandle->pRxBuffer++;
+    } else {
+        *pSSIHandle->pRxBuffer = pSSIHandle->pSSIx->DR;
+        pSSIHandle->RxLen--;
+        pSSIHandle->pRxBuffer++;
+    }
+
+    if (pSSIHandle->RxLen == 0) {
+        //disable interrupt
+        SSI_CloseReception(pSSIHandle);
+
+        SSI_ApplicationEventCallback(pSSIHandle, SSI_EVENT_RX_CMPLT);
+    }
+}
+
+static void ssi_rvr_error_interrupt_handle(SSI_Handle_t *pSSIHandle)
+{
+    if (pSSIHandle->TxState != SSI_BUSY_IN_TX) {
+        SSI_ClearOVRFlag(pSSIHandle->pSSIx);
+    }
+
+    SSI_ApplicationEventCallback(pSSIHandle, SSI_EVENT_OVR_ERR);
+}
+
+void SSI_CloseTransmission(SSI_Handle_t *pSSIHandle)
+{
+    pSSIHandle->pSSIx->IM &= ~(1 << SSIIM_TXIM);
+    pSSIHandle->pTxBuffer = NULL;
+    pSSIHandle->TxLen = 0;
+    pSSIHandle->TxState = SSI_READY;
+}
+
+void SSI_CloseReception(SSI_Handle_t *pSSIHandle)
+{
+    pSSIHandle->pSSIx->IM &= ~(1 << SSIIM_RXIM);
+    pSSIHandle->pRxBuffer = NULL;
+    pSSIHandle->RxLen = 0;
+    pSSIHandle->RxState = SSI_READY;
+}
+
+void SSI_ClearOVRFlag(SSI_RegDef_t *pSSIx)
+{
+    pSSIx->ICR |= (1 << SSIICR_RORIC);
+}
+
+__weak void SSI_ApplicationEventCallback(SSI_Handle_t *pSSIHandle, uint8_t appEv)
 {
 
 }
+
+

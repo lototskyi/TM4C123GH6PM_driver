@@ -95,6 +95,20 @@ typedef struct {
 #define SSI_RNE_FLAG                                        ( 1 << SSISR_RNE )
 #define SSI_BSY_FLAG                                        ( 1 << SSISR_BSY )
 
+/*
+ * Possible SSI application states
+ */
+#define SSI_READY                                           0
+#define SSI_BUSY_IN_RX                                      1
+#define SSI_BUSY_IN_TX                                      2
+
+/*
+ * Possible SSI application events
+ */
+#define SSI_EVENT_TX_CMPLT                                  1
+#define SSI_EVENT_RX_CMPLT                                  2
+#define SSI_EVENT_OVR_ERR                                   3
+
 void SSI_PeriClockControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi);
 
 void SSI_PeripheralControl(SSI_RegDef_t *pSSIx, uint8_t EnOrDi);
@@ -105,10 +119,20 @@ void SSI_DeInit(SSI_Handle_t *pSSIHandle);
 void SSI_SendData(SSI_RegDef_t *pSSIx, uint8_t *pTxBuffer, uint32_t Len);
 void SSI_ReceiveData(SSI_RegDef_t *pSSIx, uint8_t *pRxBuffer, uint32_t Len);
 
+uint8_t SSI_SendDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pTxBuffer, uint32_t Len);
+uint8_t SSI_ReceiveDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pRxBuffer, uint32_t Len);
+
 void SSI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnOrDi);
 void SSI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
-void SSI_IRQHandling(SSI_RegDef_t *pSSIx);
+void SSI_IRQHandling(SSI_Handle_t *pSSIHandle);
 
 uint8_t SSI_GetFlagStatus(SSI_RegDef_t *pSSIx, uint32_t FlagName);
+
+void SSI_ClearOVRFlag(SSI_RegDef_t *pSSIx);
+void SSI_CloseTransmission(SSI_Handle_t *pSSIHandle);
+void SSI_CloseReception(SSI_Handle_t *pSSIHandle);
+
+
+void SSI_ApplicationEventCallback(SSI_Handle_t *pSSIHandle, uint8_t appEv);
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_SSI_DRIVER_H_ */

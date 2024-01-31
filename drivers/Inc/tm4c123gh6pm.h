@@ -8,9 +8,11 @@
 #ifndef DRIVERS_INC_TM4C123GH6PM_H_
 #define DRIVERS_INC_TM4C123GH6PM_H_
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define __vo                        volatile
+#define __weak                      __attribute__((weak))
 
 #define ENABLE                      1
 #define DISABLE                     0
@@ -60,6 +62,10 @@
 #define IRQ_NO_GPIOD                3
 #define IRQ_NO_GPIOE                4
 #define IRQ_NO_GPIOF                30
+#define IRQ_NO_SSI0                 7
+#define IRQ_NO_SSI1                 34
+#define IRQ_NO_SSI2                 57
+#define IRQ_NO_SSI3                 58
 
 #define NVIC_IRQ_PRI0               0
 #define NVIC_IRQ_PRI1               1

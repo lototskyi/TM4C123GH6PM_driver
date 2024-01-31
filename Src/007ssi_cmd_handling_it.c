@@ -32,6 +32,7 @@ uint8_t dummy_read;
 //arduino led
 #define LED_PIN                                             9
 
+SSI_Handle_t SSI1Handle;
 
 void delay(void)
 {
@@ -68,7 +69,6 @@ void SSI1_GPIOInits(void)
 
 void SSI1_Inits(void)
 {
-    SSI_Handle_t SSI1Handle;
     SSI1Handle.pSSIx = SSI1;
     SSI1Handle.SSIConfig.SSI_FRF = FREESCALE_SPI_FRAME_FORMAT;
     SSI1Handle.SSIConfig.SSI_DeviceMode = SSI_DEVICE_MODE_MASTER;
@@ -78,6 +78,8 @@ void SSI1_Inits(void)
     SSI1Handle.SSIConfig.SSI_SPH = SSI_SPH_LOW;
 
     SSI_Init(&SSI1Handle);
+
+    SSI_IRQInterruptConfig(IRQ_NO_SSI1, ENABLE);
 }
 
 void GPIO_ButtonInit(void)
@@ -107,27 +109,27 @@ uint8_t SSI_SendCommand(uint8_t commandCode, uint8_t *args, uint32_t argsLen)
 {
     uint8_t ackByte;
 
-    SSI_SendData(SSI1, &commandCode, 1);
+    SSI_SendDataIT(&SSI1Handle, &commandCode, 1);
 
     //do dummy read
-    SSI_ReceiveData(SSI1, &dummy_read, 1);
+    SSI_ReceiveData(SSI1Handle.pSSIx, &dummy_read, 1);
 
     //send some dummy bits (1 byte) to fetch the response from the slave
-    SSI_SendData(SSI1, &dummy_write, 1);
+    SSI_SendDataIT(&SSI1Handle, &dummy_write, 1);
 
     //read ACK byte received
-    SSI_ReceiveData(SSI1, &ackByte, 1);
+    SSI_ReceiveData(SSI1Handle.pSSIx, &ackByte, 1);
 
     uint8_t response = SSI_VerifyResponse(ackByte);
 
     if ( response ) {
         //send arguments
-        SSI_SendData(SSI1, args, argsLen);
+        SSI_SendDataIT(&SSI1Handle, args, argsLen);
 
         //clean receive buffer
         uint8_t i;
         for (i = 0; i < argsLen; i++) {
-            SSI_ReceiveData(SSI1, &dummy_read, 1);
+            SSI_ReceiveData(SSI1Handle.pSSIx, &dummy_read, 1);
         }
     }
 
@@ -231,8 +233,8 @@ int main(void)
         if (idResponse) {
             int i;
             for (i = 0; i < 15; i++) {
-                SSI_SendData(SSI1, &dummy_write, 1);
-                SSI_ReceiveData(SSI1, &id[i], 1);
+                SSI_SendDataIT(&SSI1Handle, &dummy_write, 1);
+                SSI_ReceiveData(SSI1Handle.pSSIx, &id[i], 1);
             }
             id[15] = '\0';
         }
@@ -247,7 +249,10 @@ int main(void)
 }
 
 
-
+void SSI1_Handler(void)
+{
+    SSI_IRQHandling(&SSI1Handle);
+}
 
 
 
