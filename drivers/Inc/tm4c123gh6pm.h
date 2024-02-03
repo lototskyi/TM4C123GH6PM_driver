@@ -140,6 +140,7 @@
 #define SRC_PRGPIO                   ( (__vo uint32_t*) (SCR_BASE_ADDR + 0xA08) )      /* General-Purpose Input/Output Peripheral Ready :                  0xa08 */
 
 #define SCR_RCGCI2C                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x620) )      /* Inter-Integrated Circuit Run Mode Clock Gating Control :         0x620 */
+#define SCR_SRI2C                    ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x520) )      /* Inter-Integrated Circuit Software Reset :                        0x520 */
 
 #define SCR_RCGCSSI                  ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x61C) )      /* Synchronous Serial Interface Run Mode Clock Gating Control :     0x61c */
 #define SCR_SRSSI                    ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x51C) )      /* Synchronous Serial Interface Software Reset :                    0x51c */
@@ -250,6 +251,18 @@
 #define SSI3_REG_RESET()            ( *SCR_SRSSI |=  (1 << 3) );\
                                     ( *SCR_SRSSI &= ~(1 << 3) )
 
+
+/*
+ * Macros to reset I2Cx peripherals
+ */
+#define I2C0_REG_RESET()            ( *SCR_SRI2C |=  (1 << 0) );\
+                                    ( *SCR_SRI2C &= ~(1 << 0) )
+#define I2C1_REG_RESET()            ( *SCR_SRI2C |=  (1 << 1) );\
+                                    ( *SCR_SRI2C &= ~(1 << 1) )
+#define I2C2_REG_RESET()            ( *SCR_SRI2C |=  (1 << 2) );\
+                                    ( *SCR_SRI2C &= ~(1 << 2) )
+#define I2C3_REG_RESET()            ( *SCR_SRI2C |=  (1 << 3) );\
+                                    ( *SCR_SRI2C &= ~(1 << 3) )
 
 /***********************************peripheral register definition structures******************************************/
 
@@ -393,7 +406,134 @@ typedef struct {
 
 #define SSICC_CS                   0
 
+typedef struct {
+    __vo uint32_t MSA;                                /* I2C Master Slave Address :                              0x000 */
+    __vo uint32_t MCS;                                /* I2C Master Control/Status :                             0x004 */
+    __vo uint32_t MDR;                                /* I2C Master Data :                                       0x008 */
+    __vo uint32_t MTPR;                               /* I2C Master Timer Period :                               0x00C */
+    __vo uint32_t MIMR;                               /* I2C Master Interrupt Mask :                             0x010 */
+    __vo uint32_t MRIS;                               /* I2C Master Raw Interrupt Status :                       0x014 */
+    __vo uint32_t MMIS;                               /* I2C Master Masked Interrupt Status :                    0x018 */
+    __vo uint32_t MICR;                               /* I2C Master Interrupt Clear :                            0x01C */
+    __vo uint32_t MCR;                                /* I2C Master Configuration :                              0x020 */
+    __vo uint32_t MCLKOCNT;                           /* I2C Master Clock Low Timeout Count :                    0x024 */
+    uint32_t reserved_0;
+    __vo uint32_t MBMON;                              /* I2C Master Bus Monitor :                                0x02C */
+    uint32_t reserved_1[2];
+    __vo uint32_t MCR2;                               /* I2C Master Configuration 2 :                            0x038 */
+    uint32_t reserved_2[497];
+    __vo uint32_t SOAR;                               /* I2C Slave Own Address :                                 0x800 */
+    __vo uint32_t SCSR;                               /* I2C Slave Control/Status :                              0x804 */
+    __vo uint32_t SDR;                                /* I2C Slave Data :                                        0x808 */
+    __vo uint32_t SIMR;                               /* I2C Slave Interrupt Mask :                              0x80C */
+    __vo uint32_t SRIS;                               /* I2C Slave Raw Interrupt Status :                        0x810 */
+    __vo uint32_t SMIS;                               /* I2C Slave Masked Interrupt Status :                     0x814 */
+    __vo uint32_t SICR;                               /* I2C Slave Interrupt Clear :                             0x818 */
+    __vo uint32_t SOAR2;                              /* I2C Slave Own Address 2 :                               0x81C */
+    __vo uint32_t SACKCTL;                            /* I2C Slave ACK Control :                                 0x820 */
+    uint32_t reserved_3[487];
+    __vo uint32_t PP;                                 /* I2C Peripheral Properties :                             0xFC0 */
+    __vo uint32_t PC;                                 /* I2C Peripheral Configuration :                          0xFC4 */
+} I2C_RegDef_t;
+
+#define I2C0                       ( (I2C_RegDef_t*) I2C0_BASEADDR )
+#define I2C1                       ( (I2C_RegDef_t*) I2C1_BASEADDR )
+#define I2C2                       ( (I2C_RegDef_t*) I2C2_BASEADDR )
+#define I2C3                       ( (I2C_RegDef_t*) I2C3_BASEADDR )
+
+/******************************************************************************************************************
+ * Bit position definitions of I2C peripheral
+ ******************************************************************************************************************/
+#define I2CMSA_RS                 0
+#define I2CMSA_SA                 1
+
+//read-only
+#define I2CMCS_BUSY               0
+#define I2CMCS_ERROR              1
+#define I2CMCS_ADRACK             2
+#define I2CMCS_DATACK             3
+#define I2CMCS_ARBLST             4
+#define I2CMCS_IDLE               5
+#define I2CMCS_BUSBSY             6
+#define I2CMCS_CLKTO              7
+
+//write-only
+#define I2CMCS_RUN                0
+#define I2CMCS_START              1
+#define I2CMCS_STOP               2
+#define I2CMCS_ACK                3
+#define I2CMCS_HS                 4
+
+#define I2CMDR_DATA               0
+
+#define I2CMTPR_TPR               0
+#define I2CMTPR_HS                1
+
+#define I2CMIMR_IM                0
+#define I2CMIMR_CLKIM             1
+
+#define I2CMRIS_RIS               0
+#define I2CMRIS_CLKRIS            1
+
+#define I2CMMIS_MIS               0
+#define I2CMMIS_CLKMIS            1
+
+#define I2CMICR_IC                0
+#define I2CMICR_CLKIC             1
+
+#define I2CMCR_LPBK               0
+#define I2CMCR_MFE                4
+#define I2CMCR_SFE                5
+#define I2CMCR_GFE                6
+
+#define I2CMCLKOCNT_CNTL          0
+
+#define I2CMBMON_SCL              0
+#define I2CMBMON_SDA              1
+
+#define I2CMCR2_GFPW              4
+
+#define I2CSOAR_OAR               0
+
+//read-only
+#define I2CSCSR_RREQ              0
+#define I2CSCSR_TREQ              1
+#define I2CSCSR_FBR               2
+#define I2CSCSR_OAR2SEL           3
+
+//write-only
+#define I2CSCSR_DA                0
+
+#define I2CSDR_DATA               0
+
+#define I2CSIMR_DATAIM            0
+#define I2CSIMR_STARTIM           1
+#define I2CSIMR_STOPIM            2
+
+#define I2CSRIS_DATARIS           0
+#define I2CSRIS_STARTRIS          1
+#define I2CSRIS_STOPRIS           2
+
+#define I2CSMIS_DATAMIS           0
+#define I2CSMIS_STARTMIS          1
+#define I2CSMIS_STOPMIS           2
+
+#define I2CSICR_DATAIC            0
+#define I2CSICR_STARTIC           1
+#define I2CSICR_STOPIC            2
+
+#define I2CSOAR2_OAR2             0
+#define I2CSOAR2_OAR2EN           1
+
+#define I2CSACKCTL_ACKOEN         0
+#define I2CSACKCTL_ACKOVAL        1
+
+#define I2CPP_HS                  0
+
+#define I2CPC_HS                  0
+
 #include "tm4c123gh6pm_gpio_driver.h"
 #include "tm4c123gh6pm_ssi_driver.h"
+#include "tm4c123gh6pm_i2c_driver.h"
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_H_ */
