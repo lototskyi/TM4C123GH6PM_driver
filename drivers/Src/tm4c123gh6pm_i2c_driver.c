@@ -1,11 +1,13 @@
 #include "tm4c123gh6pm_i2c_driver.h"
 
-static void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx);
+static void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx, uint8_t Ack);
 static void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx);
 static void I2C_GenerateStartStopCondition(I2C_RegDef_t *pI2Cx);
 
 static void I2C_Run(I2C_RegDef_t *pI2Cx);
 static void I2C_Stop(I2C_RegDef_t *pI2Cx);
+
+static void I2C_Ack(I2C_RegDef_t *pI2Cx);
 
 uint32_t getSystemClockVal(void)
 {
@@ -73,6 +75,14 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 
     I2C_PeriClockControl(pI2Cx, ENABLE);
 
+    if (pI2CHandle->I2C_Config.I2C_MasterEnable == I2C_MASTER_ENABLE) {
+        I2C_PeripheralMasterControl(pI2Cx, ENABLE);
+    }
+
+    if (pI2CHandle->I2C_Config.I2C_SlaveEnable == I2C_SLAVE_ENABLE) {
+        I2C_PeripheralSlaveControl(pI2Cx, ENABLE);
+    }
+
     //configure timer period
     //from datasheet
     //TPR = (System Clock/(2*(SCL_LP + SCL_HP)*SCL_CLK))-1;
@@ -83,7 +93,7 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
     uint32_t SCLK = getSystemClockVal();
 
     uint8_t TPR = (SCLK / (2 * (6 + 4) * I2CSCK)) - 1;
-    pI2Cx->MTPR = TPR;
+    pI2Cx->MTPR |= (TPR << I2CMTPR_TPR);
 
     //program the device own address
     pI2Cx->SOAR = pI2CHandle->I2C_Config.I2C_DeviceAddress;
@@ -160,11 +170,16 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t L
 
     //1. write slave addr to I2CMSA
     pI2Cx->MSA = (SlaveAddr << I2CMSA_SA);
-    pI2Cx->MSA &= ~(1 << I2CMSA_RS);
+    pI2Cx->MSA &= ~(1 << I2CMSA_RS); //write
 
     while(pI2Cx->MCS & (1 << I2CMCS_BUSBSY));
 
-    I2C_GenerateStartCondition(pI2Cx);
+    pI2Cx->MDR = *pTxBuffer;
+
+    pTxBuffer++;
+    Len--;
+
+    I2C_GenerateStartCondition(pI2Cx, I2C_ACK_DISABLE);
 
     while (Len) {
 
@@ -180,11 +195,53 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t L
 
     I2C_GenerateStopCondition(pI2Cx);
 
+    while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+
 }
 
-static void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx)
+void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_t Len, uint8_t SlaveAddr)
 {
-    pI2Cx->MCS = 0x3;
+    I2C_RegDef_t *pI2Cx = pI2CHandle->pI2Cx;
+
+    //1. write slave addr to I2CMSA
+    pI2Cx->MSA = (SlaveAddr << I2CMSA_SA);
+    pI2Cx->MSA |= (1 << I2CMSA_RS); //receive
+
+    while(pI2Cx->MCS & (1 << I2CMCS_BUSBSY));
+
+    if (Len == 1) {
+        I2C_GenerateStartStopCondition(pI2Cx);
+        while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+        *pRxBuffer = pI2Cx->MDR;
+    } else {
+        I2C_GenerateStartCondition(pI2Cx, I2C_ACK_ENABLE);
+
+        while (Len) {
+            while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+
+            *pRxBuffer = pI2Cx->MDR;
+
+            if (Len > 2) {
+                I2C_Ack(pI2Cx);
+            } else {
+                I2C_GenerateStopCondition(pI2Cx);
+            }
+
+            pRxBuffer++;
+            Len--;
+        }
+    }
+
+    while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+}
+
+static void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx, uint8_t Ack)
+{
+    if (Ack == I2C_ACK_DISABLE) {
+        pI2Cx->MCS = 0x3;
+    } else {
+        pI2Cx->MCS = 0xb;
+    }
 }
 
 static void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx)
@@ -194,7 +251,7 @@ static void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx)
 
 static void I2C_GenerateStartStopCondition(I2C_RegDef_t *pI2Cx)
 {
-    pI2Cx->MCS = 0x17;
+    pI2Cx->MCS = 0x7;
 }
 
 static void I2C_Run(I2C_RegDef_t *pI2Cx)
@@ -205,6 +262,11 @@ static void I2C_Run(I2C_RegDef_t *pI2Cx)
 static void I2C_Stop(I2C_RegDef_t *pI2Cx)
 {
     pI2Cx->MCS = 0;
+}
+
+static void I2C_Ack(I2C_RegDef_t *pI2Cx)
+{
+    pI2Cx->MCS = 0x9;
 }
 
 void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, uint8_t appEv)

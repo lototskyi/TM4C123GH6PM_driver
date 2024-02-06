@@ -7,6 +7,8 @@ typedef struct {
     uint32_t I2C_SCLSpeed;
     uint32_t I2C_DeviceAddress;
     uint32_t I2C_ACKControl;
+    uint8_t  I2C_MasterEnable;
+    uint8_t  I2C_SlaveEnable;
 } I2C_Config_t;
 
 typedef struct {
@@ -24,9 +26,14 @@ typedef struct {
 /*
  * @I2C_AckControl
  */
-#define I2C_ACK_ENABLE          0
-#define I2C_ACK_DISABLE         1
+#define I2C_ACK_ENABLE          1
+#define I2C_ACK_DISABLE         0
 
+#define I2C_MASTER_ENABLE       1
+#define I2C_SLAVE_ENABLE        1
+
+#define I2C_MASTER_DISABLE      0
+#define I2C_SLAVE_DISABLE       0
 
 void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi);
 
@@ -37,6 +44,7 @@ void I2C_Init(I2C_Handle_t *pI2CHandle);
 void I2C_DeInit(I2C_Handle_t *pI2CHandle);
 
 void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t Len, uint8_t SlaveAddr);
+void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_t Len, uint8_t SlaveAddr);
 
 void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnOrDi);
 void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);

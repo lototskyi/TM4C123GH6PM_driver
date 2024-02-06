@@ -12,9 +12,7 @@ I2C_Handle_t I2C1Handle;
 #define MY_ADDR             0x61
 #define SLAVE_ADDR          0x68
 
-const uint8_t data[32] = "We are testing I2C master Tx";
-uint8_t buffer[32];
-uint32_t counter = 0;
+const uint8_t data[32];
 
 void delay(void)
 {
@@ -31,7 +29,6 @@ void I2C3_GPIOInits(void)
     I2CPins.GPIO_PinConfig.GPIO_PinAltFunMode = 3;
     I2CPins.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_OD;
     I2CPins.GPIO_PinConfig.GPIO_PinPinPuPdControl = GPIO_PIN_PU;
-
 
 
     //SDA
@@ -79,17 +76,24 @@ int main(void)
     GPIO_ButtonInit();
     I2C3_Inits();
 
+    uint8_t commandCode, len;
+
     while(1) {
         while( GPIO_ReadFromInputPin(GPIOF_AHB, GPIO_PIN_NO_4) );
         delay();
 
-        sprintf((char*)buffer, "%s %u", (char*)data, counter);
+        commandCode = 0x51;
 
-        printf("%s\n", buffer);
+        I2C_MasterSendData(&I2C1Handle, &commandCode, 1, SLAVE_ADDR);
+        I2C_MasterReceiveData(&I2C1Handle, &len, 1, SLAVE_ADDR);
 
-        I2C_MasterSendData(&I2C1Handle, buffer, strlen((char*)buffer), SLAVE_ADDR);
+        commandCode = 0x52;
 
-        counter++;
+        I2C_MasterSendData(&I2C1Handle, &commandCode, 1, SLAVE_ADDR);
+
+        I2C_MasterReceiveData(&I2C1Handle, (uint8_t*)data, len, SLAVE_ADDR);
+
+        printf("%s\n", data);
     }
 
     return 0;
