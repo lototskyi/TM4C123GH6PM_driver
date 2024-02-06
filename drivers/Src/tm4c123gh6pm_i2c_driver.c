@@ -164,7 +164,7 @@ void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
     *(NVIC_PR_BASE_ADDR + iprx) |= ( IRQPriority << shift_amount );
 }
 
-void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
+void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr)
 {
     I2C_RegDef_t *pI2Cx = pI2CHandle->pI2Cx;
 
@@ -172,7 +172,9 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t L
     pI2Cx->MSA = (SlaveAddr << I2CMSA_SA);
     pI2Cx->MSA &= ~(1 << I2CMSA_RS); //write
 
-    while(pI2Cx->MCS & (1 << I2CMCS_BUSBSY));
+    if (Sr == I2C_NO_REPEAT_START) {
+        while(pI2Cx->MCS & (1 << I2CMCS_BUSBSY));
+    }
 
     pI2Cx->MDR = *pTxBuffer;
 
@@ -193,13 +195,14 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t L
         Len--;
     }
 
-    I2C_GenerateStopCondition(pI2Cx);
+    if (Sr == I2C_NO_REPEAT_START) {
+        I2C_GenerateStopCondition(pI2Cx);
+    }
 
     while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
-
 }
 
-void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_t Len, uint8_t SlaveAddr)
+void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr)
 {
     I2C_RegDef_t *pI2Cx = pI2CHandle->pI2Cx;
 
@@ -207,10 +210,14 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_
     pI2Cx->MSA = (SlaveAddr << I2CMSA_SA);
     pI2Cx->MSA |= (1 << I2CMSA_RS); //receive
 
-    while(pI2Cx->MCS & (1 << I2CMCS_BUSBSY));
-
     if (Len == 1) {
-        I2C_GenerateStartStopCondition(pI2Cx);
+        if (Sr == I2C_NO_REPEAT_START) {
+            while(pI2Cx->MCS & (1 << I2CMCS_BUSBSY));
+            I2C_GenerateStartStopCondition(pI2Cx);
+        } else {
+            I2C_GenerateStartCondition(pI2Cx, I2C_ACK_ENABLE);
+        }
+
         while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
         *pRxBuffer = pI2Cx->MDR;
     } else {
@@ -224,7 +231,11 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_
             if (Len > 2) {
                 I2C_Ack(pI2Cx);
             } else {
-                I2C_GenerateStopCondition(pI2Cx);
+                if (Sr == I2C_NO_REPEAT_START) {
+                    I2C_GenerateStopCondition(pI2Cx);
+                } else {
+                    I2C_Run(pI2Cx);
+                }
             }
 
             pRxBuffer++;

@@ -84,14 +84,14 @@ int main(void)
 
         commandCode = 0x51;
 
-        I2C_MasterSendData(&I2C1Handle, &commandCode, 1, SLAVE_ADDR);
-        I2C_MasterReceiveData(&I2C1Handle, &len, 1, SLAVE_ADDR);
+        I2C_MasterSendData(&I2C1Handle, &commandCode, 1, SLAVE_ADDR, I2C_REPEAT_START);
+        I2C_MasterReceiveData(&I2C1Handle, &len, 1, SLAVE_ADDR, I2C_REPEAT_START);
 
         commandCode = 0x52;
 
-        I2C_MasterSendData(&I2C1Handle, &commandCode, 1, SLAVE_ADDR);
+        I2C_MasterSendData(&I2C1Handle, &commandCode, 1, SLAVE_ADDR, I2C_REPEAT_START);
 
-        I2C_MasterReceiveData(&I2C1Handle, (uint8_t*)data, len, SLAVE_ADDR);
+        I2C_MasterReceiveData(&I2C1Handle, (uint8_t*)data, len, SLAVE_ADDR, I2C_NO_REPEAT_START);
 
         printf("%s\n", data);
     }
