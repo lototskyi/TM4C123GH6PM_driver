@@ -96,7 +96,7 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
     pI2Cx->MTPR |= (TPR << I2CMTPR_TPR);
 
     //program the device own address
-    pI2Cx->SOAR = pI2CHandle->I2C_Config.I2C_DeviceAddress;
+    pI2Cx->SOAR = pI2CHandle->I2C_Config.I2C_SlaveDeviceAddress;
 
     pI2Cx->MCLKOCNT = 200;
 }
@@ -199,7 +199,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t L
         I2C_GenerateStopCondition(pI2Cx);
     }
 
-    while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+    //while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
 }
 
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr)
@@ -243,7 +243,17 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_
         }
     }
 
-    while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+    //while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+}
+
+void I2C_SlaveSendData(I2C_RegDef_t *pI2Cx, uint8_t data)
+{
+    pI2Cx->SDR = data;
+}
+
+uint8_t I2C_SlaveReceiveData(I2C_RegDef_t *pI2Cx)
+{
+    return (uint8_t)pI2Cx->SDR;
 }
 
 static void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx, uint8_t Ack)
@@ -280,7 +290,48 @@ static void I2C_Ack(I2C_RegDef_t *pI2Cx)
     pI2Cx->MCS = 0x9;
 }
 
-void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, uint8_t appEv)
+void I2C_IRQHandling(I2C_Handle_t *pI2CHandle)
+{
+    I2C_RegDef_t *pI2Cx = pI2CHandle->pI2Cx;
+
+    //master
+    if (pI2Cx->MMIS & (1 << I2CMMIS_MIS) && !(pI2Cx->MCS & (1 << I2CMCS_BUSY)) ) {
+        pI2Cx->MICR |= (1 << I2CMICR_IC);
+
+        if (pI2Cx->MCS & (1 << I2CMCS_ERROR)) {
+            //handle error
+            if (pI2Cx->MCS & (1 << I2CMCS_ADRACK)) {
+                printf("Address NACK!\n");
+            } else if (pI2Cx->MCS & (1 << I2CMCS_DATACK)) {
+                printf("Data NACK!\n");
+            }
+
+        } else {
+            I2C_ApplicationEventMasterCallback(pI2CHandle);
+        }
+    } else if (pI2Cx->SMIS & (1 << I2CSMIS_DATAMIS)) { //slave data
+        pI2Cx->SICR |= (1 << I2CSICR_DATAIC);
+        if (pI2Cx->SCSR & (1 << I2CSCSR_TREQ)) {
+            I2C_ApplicationEventSlaveCallback(pI2CHandle, I2C_EV_DATA_REQ);
+        } else if (pI2Cx->SCSR & (1 << I2CSCSR_RREQ)) {
+            I2C_ApplicationEventSlaveCallback(pI2CHandle, I2C_EV_DATA_RCV);
+        }
+
+    } else if (pI2Cx->SMIS & (1 << I2CSMIS_STARTMIS)) { //slave start
+        pI2Cx->SICR |= (1 << I2CSICR_STARTIC);
+    } else if (pI2Cx->SMIS & (1 << I2CSMIS_STOPMIS)) { //slave stop
+        pI2Cx->SICR |= (1 << I2CSICR_STOPIC);
+        I2C_ApplicationEventSlaveCallback(pI2CHandle, I2C_EV_STOP);
+    }
+
+}
+
+__attribute__((weak)) void I2C_ApplicationEventMasterCallback(I2C_Handle_t *pI2CHandle)
+{
+
+}
+
+__attribute__((weak)) void I2C_ApplicationEventSlaveCallback(I2C_Handle_t *pI2CHandle, uint8_t event)
 {
 
 }

@@ -118,6 +118,20 @@
 							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS.490575701" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.113956637.371923792" name="009i2c_master_rx_testing2.c" rcbsApplicability="disable" resourcePath="Src/009i2c_master_rx_testing2.c" toolsToInvoke="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.198012849">
+						<tool id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.198012849" name="Arm Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055">
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__C_SRCS.196043223" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__C_SRCS"/>
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__CPP_SRCS.770921424" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__CPP_SRCS"/>
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM_SRCS.258596225" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM_SRCS"/>
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS.1144845686" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.14579566" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1109575061" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.506159110" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.113956637.741922006" name="005spi_txonly_arduino.c" rcbsApplicability="disable" resourcePath="Src/005spi_txonly_arduino.c" toolsToInvoke="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.629203716">
 						<tool id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.629203716" name="Arm Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055">
 							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__C_SRCS.730337335" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__C_SRCS"/>
@@ -125,6 +139,9 @@
 							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM_SRCS.690945526" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM_SRCS"/>
 							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS.214534093" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS"/>
 						</tool>
+					</fileInfo>
+					<fileInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.113956637.1140617455" name="010i2c_slave_tx_testing.c" rcbsApplicability="disable" resourcePath="Src/010i2c_slave_tx_testing.c" toolsToInvoke="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.338429096">
+						<tool id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.338429096" name="Arm Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055"/>
 					</fileInfo>
 					<fileInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.113956637.432286247" name="004ssi_tx_testing.c" rcbsApplicability="disable" resourcePath="Src/004ssi_tx_testing.c" toolsToInvoke="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.703028526">
 						<tool id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.703028526" name="Arm Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055">
@@ -177,7 +194,12 @@
 						</tool>
 					</fileInfo>
 					<fileInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.113956637.316459692" name="008i2c_master_tx_testing.c" rcbsApplicability="disable" resourcePath="Src/008i2c_master_tx_testing.c" toolsToInvoke="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.1671980594">
-						<tool id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.1671980594" name="Arm Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055"/>
+						<tool id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055.1671980594" name="Arm Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.exe.compilerDebug.1386842055">
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__C_SRCS.2023158229" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__C_SRCS"/>
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__CPP_SRCS.2079147109" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__CPP_SRCS"/>
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM_SRCS.823878897" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM_SRCS"/>
+							<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS.884124143" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compiler.inputType__ASM2_SRCS"/>
+						</tool>
 						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.2135600267" name="Resource Custom Build Step">
 							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.712961967" name="Resource Custom Build Step Input Type">
 								<additionalInput kind="additionalinputdependency" paths=""/>
@@ -201,7 +223,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Src/008i2c_master_tx_testing.c|Src/007ssi_cmd_handling_it.c|Src/006ssi_cmd_handling.c|Src/005spi_txonly_arduino.c|Src/004ssi_tx_testing.c|Src/003button_interrupt.c|Src/002led_button.c|Src/001led_toggle_open_drain.c|Src/001led_toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Src/010i2c_slave_tx_testing.c|Src/009i2c_master_rx_testing2.c|Src/008i2c_master_tx_testing.c|Src/007ssi_cmd_handling_it.c|Src/006ssi_cmd_handling.c|Src/005spi_txonly_arduino.c|Src/004ssi_tx_testing.c|Src/003button_interrupt.c|Src/002led_button.c|Src/001led_toggle_open_drain.c|Src/001led_toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

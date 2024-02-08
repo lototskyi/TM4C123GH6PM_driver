@@ -8,6 +8,7 @@
 #ifndef DRIVERS_INC_TM4C123GH6PM_H_
 #define DRIVERS_INC_TM4C123GH6PM_H_
 
+#include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -66,6 +67,10 @@
 #define IRQ_NO_SSI1                 34
 #define IRQ_NO_SSI2                 57
 #define IRQ_NO_SSI3                 58
+#define IRQ_NO_I2C0                 8
+#define IRQ_NO_I2C1                 37
+#define IRQ_NO_I2C2                 68
+#define IRQ_NO_I2C3                 69
 
 #define NVIC_IRQ_PRI0               0
 #define NVIC_IRQ_PRI1               1

@@ -36,6 +36,7 @@ static void IntDefaultHandler(void);
 
 void GPIOF_Handler(void);
 void SSI1_Handler(void);
+void I2C3_Handler(void);
 
 //*****************************************************************************
 //
@@ -155,7 +156,7 @@ void (* const g_pfnVectors[])(void) =
     0,                                      // Reserved
     0,                                      // Reserved
     IntDefaultHandler,                      // I2C2 Master and Slave
-    IntDefaultHandler,                      // I2C3 Master and Slave
+    I2C3_Handler,                            // I2C3 Master and Slave
     IntDefaultHandler,                      // Timer 4 subtimer A
     IntDefaultHandler,                      // Timer 4 subtimer B
     0,                                      // Reserved
@@ -313,6 +314,16 @@ __attribute__((weak)) void GPIOF_Handler(void)
 }
 
 __attribute__((weak)) void SSI1_Handler(void)
+{
+    //
+    // Go into an infinite loop.
+    //
+    while(1)
+    {
+    }
+}
+
+__attribute__((weak)) void I2C3_Handler(void)
 {
     //
     // Go into an infinite loop.
