@@ -102,6 +102,7 @@ void I2C_ApplicationEventSlaveCallback(I2C_Handle_t *pI2CHandle, uint8_t event)
             if (Cnt == dataLen) {
                 commandCode = 0xff;
                 Cnt = 0;
+                tempLen = dataLen;
             }
         }
     } else if (event == I2C_EV_DATA_RCV) {
