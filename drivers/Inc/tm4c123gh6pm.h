@@ -151,6 +151,7 @@
 #define SCR_SRSSI                    ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x51C) )      /* Synchronous Serial Interface Software Reset :                    0x51c */
 
 #define SCR_RCGCUART                 ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x618) )      /* Universal Asynchronous Receiver/Transmitter Run Mode Clock Gating Control : 0x618 */
+#define SCR_SRUART                   ( (__vo uint32_t*) (SCR_BASE_ADDR + 0x518) )      /* Universal Asynchronous Receiver/Transmitter Software Reset :     0x518 */
 
 /*
  * Clock Enable Macros for GPIOx peripherals
@@ -268,6 +269,26 @@
                                     ( *SCR_SRI2C &= ~(1 << 2) )
 #define I2C3_REG_RESET()            ( *SCR_SRI2C |=  (1 << 3) );\
                                     ( *SCR_SRI2C &= ~(1 << 3) )
+
+/*
+ * Macros to reset UARTx peripherals
+ */
+#define UART0_REG_RESET()           ( *SCR_SRUART |=  (1 << 0) );\
+                                    ( *SCR_SRUART &= ~(1 << 0) )
+#define UART1_REG_RESET()           ( *SCR_SRUART |=  (1 << 1) );\
+                                    ( *SCR_SRUART &= ~(1 << 1) )
+#define UART2_REG_RESET()           ( *SCR_SRUART |=  (1 << 2) );\
+                                    ( *SCR_SRUART &= ~(1 << 2) )
+#define UART3_REG_RESET()           ( *SCR_SRUART |=  (1 << 3) );\
+                                    ( *SCR_SRUART &= ~(1 << 3) )
+#define UART4_REG_RESET()           ( *SCR_SRUART |=  (1 << 4) );\
+                                    ( *SCR_SRUART &= ~(1 << 4) )
+#define UART5_REG_RESET()           ( *SCR_SRUART |=  (1 << 5) );\
+                                    ( *SCR_SRUART &= ~(1 << 5) )
+#define UART6_REG_RESET()           ( *SCR_SRUART |=  (1 << 6) );\
+                                    ( *SCR_SRUART &= ~(1 << 6) )
+#define UART7_REG_RESET()           ( *SCR_SRUART |=  (1 << 7) );\
+                                    ( *SCR_SRUART &= ~(1 << 7) )
 
 /***********************************peripheral register definition structures******************************************/
 
@@ -537,8 +558,147 @@ typedef struct {
 
 #define I2CPC_HS                  0
 
+
+typedef struct {
+    __vo uint32_t DR;                                /* UART Data :                                              0x000 */
+    __vo uint32_t RSR;                               /* UART Receive Status/Error Clear :                        0x004 */
+    uint32_t reserved_0[4];
+    __vo uint32_t FR;                                /* UART Flag :                                              0x018 */
+    uint32_t reserved_1[1];
+    __vo uint32_t ILPR;                              /* UART IrDA Low-Power Register :                           0x020 */
+    __vo uint32_t IBRD;                              /* UART Integer Baud-Rate Divisor :                         0x024 */
+    __vo uint32_t FBRD;                              /* UART Fractional Baud-Rate Divisor :                      0x028 */
+    __vo uint32_t LCRH;                              /* UART Line Control :                                      0x02C */
+    __vo uint32_t CTL;                               /* UART Control :                                           0x030 */
+    __vo uint32_t IFLS;                              /* UART Interrupt FIFO Level Select :                       0x034 */
+    __vo uint32_t IM;                                /* UART Interrupt Mask :                                    0x038 */
+    __vo uint32_t RIS;                               /* UART Raw Interrupt Status :                              0x03C */
+    __vo uint32_t MIS;                               /* UART Masked Interrupt Status :                           0x040 */
+    __vo uint32_t ICR;                               /* UART Interrupt Clear :                                   0x044 */
+    __vo uint32_t DMACTL;                            /* UART DMA Control :                                       0x048 */
+    uint32_t reserved_2[22];
+    __vo uint32_t _9BITADDR;                         /* UART 9-Bit Self Address :                                0x0A4 */
+    __vo uint32_t _9BITAMASK;                        /* UART 9-Bit Self Address Mask :                           0x0A8 */
+
+
+} UART_RegDef_t;
+
+#define UART0                      ( (UART_RegDef_t*) UART0_BASEADDR )
+#define UART1                      ( (UART_RegDef_t*) UART1_BASEADDR )
+#define UART2                      ( (UART_RegDef_t*) UART2_BASEADDR )
+#define UART3                      ( (UART_RegDef_t*) UART3_BASEADDR )
+#define UART4                      ( (UART_RegDef_t*) UART4_BASEADDR )
+#define UART5                      ( (UART_RegDef_t*) UART5_BASEADDR )
+#define UART6                      ( (UART_RegDef_t*) UART6_BASEADDR )
+#define UART7                      ( (UART_RegDef_t*) UART7_BASEADDR )
+
+
+/******************************************************************************************************************
+ * Bit position definitions of UART peripheral
+ ******************************************************************************************************************/
+
+#define UARTDR_DATA                0
+#define UARTDR_FE                  8
+#define UARTDR_PE                  9
+#define UARTDR_BE                  10
+#define UARTDR_OE                  11
+
+#define UARTRSR_FE                 0
+#define UARTRSR_PE                 1
+#define UARTRSR_BE                 2
+#define UARTRSR_OE                 3
+
+#define UARTECR_DATA               0
+
+#define UARTFR_CTS                 0
+#define UARTFR_BUSY                3
+#define UARTFR_RXFE                4
+#define UARTFR_TXFF                5
+#define UARTFR_RXFF                6
+#define UARTFR_TXFE                7
+
+#define UARTILPR_ILPDVSR           0
+
+#define UARTIBRD_DIVUNT            0
+
+#define UARTFBRD_DIVFRAC           0
+
+#define UARTLCRH_BRK               0
+#define UARTLCRH_PEN               1
+#define UARTLCRH_EPS               2
+#define UARTLCRH_STP2              3
+#define UARTLCRH_FEN               4
+#define UARTLCRH_WLEN              5
+#define UARTLCRH_SPS               7
+
+#define UARTCTL_UARTEN             0
+#define UARTCTL_SIREN              1
+#define UARTCTL_SIRLP              2
+#define UARTCTL_SMART              3
+#define UARTCTL_EOT                4
+#define UARTCTL_HSE                5
+#define UARTCTL_LBE                7
+#define UARTCTL_TXE                8
+#define UARTCTL_RXE                9
+#define UARTCTL_RTS                11
+#define UARTCTL_RTSEN              14
+#define UARTCTL_CTSEN              15
+
+#define UARTIFLS_TXIFLSEL          0
+#define UARTIFLS_RXIFLSEL          3
+
+#define UARTIM_CTSIM               1
+#define UARTIM_RXIM                4
+#define UARTIM_TXIM                5
+#define UARTIM_RTIM                6
+#define UARTIM_FEIM                7
+#define UARTIM_PEIM                8
+#define UARTIM_BEIM                9
+#define UARTIM_OEIM                10
+#define UARTIM_9BITIM              12
+
+#define UARTRIS_CTSRIS             1
+#define UARTRIS_RXRIS              4
+#define UARTRIS_TXRIS              5
+#define UARTRIS_RTRIS              6
+#define UARTRIS_FERIS              7
+#define UARTRIS_PERIS              8
+#define UARTRIS_BERIS              9
+#define UARTRIS_OERIS              10
+#define UARTRIS_9BITRIS            12
+
+#define UARTMIS_CTSMIS             1
+#define UARTMIS_RXMIS              4
+#define UARTMIS_TXMIS              5
+#define UARTMIS_RTMIS              6
+#define UARTMIS_FEMIS              7
+#define UARTMIS_PEMIS              8
+#define UARTMIS_BEMIS              9
+#define UARTMIS_OEMIS              10
+#define UARTMIS_9BITMIS            12
+
+#define UARTMIC_CTSMIC             1
+#define UARTMIC_RXMIC              4
+#define UARTMIC_TXMIC              5
+#define UARTMIC_RTMIC              6
+#define UARTMIC_FEMIC              7
+#define UARTMIC_PEMIC              8
+#define UARTMIC_BEMIC              9
+#define UARTMIC_OEMIC              10
+#define UARTMIC_9BITMIC            12
+
+#define UARTDMACTL_RXDMAE          0
+#define UARTDMACTL_TXDMAE          1
+#define UARTDMACTL_DMAERR          2
+
+#define UART9BITADDR_ADDR          0
+#define UART9BITADDR_9BITEN        15
+
+
+
 #include "tm4c123gh6pm_gpio_driver.h"
 #include "tm4c123gh6pm_ssi_driver.h"
 #include "tm4c123gh6pm_i2c_driver.h"
+#include "tm4c123gh6pm_uart_driver.h"
 
 #endif /* DRIVERS_INC_TM4C123GH6PM_H_ */
