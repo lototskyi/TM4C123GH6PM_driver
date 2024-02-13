@@ -71,6 +71,14 @@
 #define IRQ_NO_I2C1                 37
 #define IRQ_NO_I2C2                 68
 #define IRQ_NO_I2C3                 69
+#define IRQ_NO_UART0                5
+#define IRQ_NO_UART1                6
+#define IRQ_NO_UART2                33
+#define IRQ_NO_UART3                59
+#define IRQ_NO_UART4                60
+#define IRQ_NO_UART5                61
+#define IRQ_NO_UART6                62
+#define IRQ_NO_UART7                63
 
 #define NVIC_IRQ_PRI0               0
 #define NVIC_IRQ_PRI1               1
@@ -677,15 +685,15 @@ typedef struct {
 #define UARTMIS_OEMIS              10
 #define UARTMIS_9BITMIS            12
 
-#define UARTMIC_CTSMIC             1
-#define UARTMIC_RXMIC              4
-#define UARTMIC_TXMIC              5
-#define UARTMIC_RTMIC              6
-#define UARTMIC_FEMIC              7
-#define UARTMIC_PEMIC              8
-#define UARTMIC_BEMIC              9
-#define UARTMIC_OEMIC              10
-#define UARTMIC_9BITMIC            12
+#define UARTICR_CTSMIC             1
+#define UARTICR_RXIC               4
+#define UARTICR_TXIC               5
+#define UARTICR_RTIC               6
+#define UARTICR_FEIC               7
+#define UARTICR_PEIC               8
+#define UARTICR_BEIC               9
+#define UARTICR_OEIC               10
+#define UARTICR_9BITIC             12
 
 #define UARTDMACTL_RXDMAE          0
 #define UARTDMACTL_TXDMAE          1

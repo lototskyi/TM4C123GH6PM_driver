@@ -1,6 +1,8 @@
 #include "tm4c123gh6pm_uart_driver.h"
 
 
+static void storeDataIntoBuffer(UART_Handle_t *pUARTHandle);
+
 /*
  * Peripheral Clock setup
  */
@@ -184,6 +186,39 @@ void UART_ReceiveData(UART_Handle_t *pUARTHandle, uint8_t *pRxBuffer, uint32_t L
     while(UART_GetFlagStatus(pUARTx, UART_FLAG_BUSY));
 }
 
+uint8_t UART_SendDataIT(UART_Handle_t *pUARTHandle,uint8_t *pTxBuffer, uint32_t Len)
+{
+    uint8_t txState = pUARTHandle->TxBusyState;
+
+    if (txState != UART_BUSY_IN_TX) {
+
+        pUARTHandle->TxLen = Len;
+        pUARTHandle->pTxBuffer = pTxBuffer;
+        pUARTHandle->TxBusyState = UART_BUSY_IN_TX;
+
+        pUARTHandle->pUARTx->IM |= (1 << UARTIM_TXIM);
+
+        storeDataIntoBuffer(pUARTHandle);
+    }
+
+    return txState;
+}
+
+uint8_t UART_ReceiveDataIT(UART_Handle_t *pUARTHandle, uint8_t *pRxBuffer, uint32_t Len)
+{
+    uint8_t rxState = pUARTHandle->RxBusyState;
+
+    if (rxState != UART_BUSY_IN_RX) {
+
+        pUARTHandle->RxLen = Len;
+        pUARTHandle->pRxBuffer = pRxBuffer;
+        pUARTHandle->RxBusyState = UART_BUSY_IN_RX;
+
+        pUARTHandle->pUARTx->IM |= (1 << UARTIM_RXIM);
+    }
+
+    return rxState;
+}
 
 /*
  * IRQ Configuration and ISR handling
@@ -238,12 +273,6 @@ void UART_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
     *(NVIC_PR_BASE_ADDR + iprx) |= ( IRQPriority << shift_amount );
 }
 
-void UART_IRQHandling(UART_Handle_t *pHandle)
-{
-
-}
-
-
 /*
  * Other Peripheral Control APIs
  */
@@ -270,10 +299,75 @@ void UART_ClearFlag(UART_RegDef_t *pUARTx, uint16_t StatusFlagName)
 
 }
 
+static void storeDataIntoBuffer(UART_Handle_t *pUARTHandle)
+{
+    UART_RegDef_t *pUARTx = pUARTHandle->pUARTx;
+    UART_Config_t UART_Config = pUARTHandle->UART_Config;
+
+    if(UART_Config.UART_WordLength == UART_WORDLEN_8BITS) {
+        pUARTx->DR = (*pUARTHandle->pTxBuffer & (uint8_t)0x0FF);
+    } else if (UART_Config.UART_WordLength == UART_WORDLEN_7BITS) {
+        pUARTx->DR = (*pUARTHandle->pTxBuffer & (uint8_t)0x07F);
+    } else if (UART_Config.UART_WordLength == UART_WORDLEN_6BITS) {
+        pUARTx->DR = (*pUARTHandle->pTxBuffer & (uint8_t)0x03F);
+    } else if (UART_Config.UART_WordLength == UART_WORDLEN_5BITS) {
+        pUARTx->DR = (*pUARTHandle->pTxBuffer & (uint8_t)0x01F);
+    }
+}
+
+void UART_IRQHandling(UART_Handle_t *pUARTHandle)
+{
+
+    UART_RegDef_t *pUARTx = pUARTHandle->pUARTx;
+
+    while(UART_GetFlagStatus(pUARTx, UART_FLAG_BUSY));
+
+    if (pUARTHandle->RxBusyState == UART_BUSY_IN_RX && pUARTx->RIS & (1 << UARTRIS_RXRIS) && pUARTHandle->RxLen > 0) {
+        *pUARTHandle->pRxBuffer = pUARTx->DR;
+        pUARTHandle->pRxBuffer++;
+        pUARTHandle->RxLen--;
+    } else if (pUARTHandle->TxBusyState == UART_BUSY_IN_TX && (pUARTx->RIS & (1 << UARTRIS_TXRIS)) && pUARTHandle->TxLen > 0) {
+
+        pUARTHandle->pTxBuffer++;
+        pUARTHandle->TxLen--;
+
+        if (pUARTHandle->TxLen > 0) {
+            storeDataIntoBuffer(pUARTHandle);
+        }
+    }
+
+    if (pUARTHandle->RxLen == 0 && pUARTHandle->RxBusyState == UART_BUSY_IN_RX) {
+        pUARTHandle->pUARTx->ICR |= (1 << UARTICR_RXIC);
+        //disable interrupt
+        pUARTHandle->pUARTx->IM &= ~(1 << UARTIM_RXIM);
+
+        pUARTHandle->pRxBuffer = NULL;
+        pUARTHandle->RxLen = 0;
+        pUARTHandle->RxBusyState = UART_READY;
+
+        UART_ApplicationEventCallback(pUARTHandle, UART_EVENT_RX_CMPLT);
+    }
+
+
+
+    if (pUARTHandle->TxLen == 0) {
+        pUARTHandle->pUARTx->ICR |= (1 << UARTICR_TXIC);
+        //disable interrupt
+        pUARTHandle->pUARTx->IM &= ~(1 << UARTIM_TXIM);
+
+        pUARTHandle->pTxBuffer = NULL;
+        pUARTHandle->TxLen = 0;
+        pUARTHandle->TxBusyState = UART_READY;
+
+        UART_ApplicationEventCallback(pUARTHandle, UART_EVENT_TX_CMPLT);
+    }
+
+}
+
 /*
  * Application callback
  */
-void UART_ApplicationEventCallback(UART_Handle_t *pUARTHandle,uint8_t AppEv)
+__attribute__((weak)) void UART_ApplicationEventCallback(UART_Handle_t *pUARTHandle, uint8_t AppEv)
 {
 
 }

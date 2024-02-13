@@ -37,6 +37,7 @@ static void IntDefaultHandler(void);
 void GPIOF_Handler(void);
 void SSI1_Handler(void);
 void I2C3_Handler(void);
+void UART5_Handler(void);
 
 //*****************************************************************************
 //
@@ -148,7 +149,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // SSI3 Rx and Tx
     IntDefaultHandler,                      // UART3 Rx and Tx
     IntDefaultHandler,                      // UART4 Rx and Tx
-    IntDefaultHandler,                      // UART5 Rx and Tx
+    UART5_Handler,                          // UART5 Rx and Tx
     IntDefaultHandler,                      // UART6 Rx and Tx
     IntDefaultHandler,                      // UART7 Rx and Tx
     0,                                      // Reserved
@@ -324,6 +325,16 @@ __attribute__((weak)) void SSI1_Handler(void)
 }
 
 __attribute__((weak)) void I2C3_Handler(void)
+{
+    //
+    // Go into an infinite loop.
+    //
+    while(1)
+    {
+    }
+}
+
+__attribute__((weak)) void UART5_Handler(void)
 {
     //
     // Go into an infinite loop.

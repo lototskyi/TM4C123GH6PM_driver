@@ -15,6 +15,12 @@ typedef struct {
 typedef struct {
     UART_RegDef_t *pUARTx;
     UART_Config_t UART_Config;
+    uint8_t       *pTxBuffer;
+    uint8_t       *pRxBuffer;
+    uint32_t      TxLen;
+    uint32_t      RxLen;
+    uint8_t       TxBusyState;
+    uint8_t       RxBusyState;
 } UART_Handle_t;
 
 /*
@@ -83,21 +89,21 @@ typedef struct {
  * USART flags
  */
 
-#define UART_FLAG_TXFE                      ( 1 << UARTFR_TXFE)
-#define UART_FLAG_RXFF                      ( 1 << UARTFR_RXFF)
-#define UART_FLAG_BUSY                      ( 1 << UARTFR_BUSY)
+#define UART_FLAG_TXFE                     ( 1 << UARTFR_TXFE)
+#define UART_FLAG_RXFF                     ( 1 << UARTFR_RXFF)
+#define UART_FLAG_BUSY                     ( 1 << UARTFR_BUSY)
 
 /*
  * Application states
-// */
-//#define UART_BUSY_IN_RX                    1
-//#define UART_BUSY_IN_TX                    2
-//#define UART_READY                         0
+ */
+#define UART_BUSY_IN_RX                    1
+#define UART_BUSY_IN_TX                    2
+#define UART_READY                         0
 //
 //
-//#define USART_EVENT_TX_CMPLT                0
-//#define USART_EVENT_RX_CMPLT                1
-//#define USART_EVENT_IDLE                    2
+#define UART_EVENT_TX_CMPLT                0
+#define UART_EVENT_RX_CMPLT                1
+#define UART_EVENT_IDLE                    2
 //#define USART_EVENT_CTS                     3
 //#define USART_EVENT_PE                      4
 //#define USART_ERR_FE                        5
@@ -105,11 +111,8 @@ typedef struct {
 //#define USART_ERR_ORE                       7
 //
 //
-///*
-// * SPI related status flags definitions
-// */
-//#define USART_TXE_FLAG                                      (1 << USART_SR_TXE)
-//#define USART_RXNE_FLAG                                     (1 << USART_SR_RXNE)
+
+
 
 
 /******************************************************************************************
