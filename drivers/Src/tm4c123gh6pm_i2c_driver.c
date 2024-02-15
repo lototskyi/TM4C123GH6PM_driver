@@ -199,7 +199,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint32_t L
         I2C_GenerateStopCondition(pI2Cx);
     }
 
-    //while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+    while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
 }
 
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr)
@@ -243,7 +243,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint32_
         }
     }
 
-    //while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
+    while(pI2Cx->MCS & (1 << I2CMCS_BUSY));
 }
 
 void I2C_SlaveSendData(I2C_RegDef_t *pI2Cx, uint8_t data)

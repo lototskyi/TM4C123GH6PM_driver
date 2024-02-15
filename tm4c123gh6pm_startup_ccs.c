@@ -38,6 +38,7 @@ void GPIOF_Handler(void);
 void SSI1_Handler(void);
 void I2C3_Handler(void);
 void UART5_Handler(void);
+void SysTick_Handler(void);
 
 //*****************************************************************************
 //
@@ -87,7 +88,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // Debug monitor handler
     0,                                      // Reserved
     IntDefaultHandler,                      // The PendSV handler
-    IntDefaultHandler,                      // The SysTick handler
+    SysTick_Handler,                        // The SysTick handler
     IntDefaultHandler,                      // GPIO Port A
     IntDefaultHandler,                      // GPIO Port B
     IntDefaultHandler,                      // GPIO Port C
@@ -335,6 +336,16 @@ __attribute__((weak)) void I2C3_Handler(void)
 }
 
 __attribute__((weak)) void UART5_Handler(void)
+{
+    //
+    // Go into an infinite loop.
+    //
+    while(1)
+    {
+    }
+}
+
+__attribute__((weak)) void SysTick_Handler(void)
 {
     //
     // Go into an infinite loop.
