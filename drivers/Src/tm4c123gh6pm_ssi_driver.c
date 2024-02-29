@@ -187,6 +187,7 @@ void SSI_ReceiveData(SSI_RegDef_t *pSSIx, uint8_t *pRxBuffer, uint32_t Len)
     }
 }
 
+//NVIC related configurations
 void SSI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnOrDi)
 {
     uint8_t IRQBitNumber = (uint8_t)(IRQNumber % 32);
@@ -237,6 +238,7 @@ void SSI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
     *(NVIC_PR_BASE_ADDR + iprx) |= ( IRQPriority << shift_amount );
 }
 
+//Send data with Interrupt
 uint8_t SSI_SendDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pTxBuffer, uint32_t Len)
 {
     uint8_t state = pSSIHandle->TxState;
@@ -253,6 +255,7 @@ uint8_t SSI_SendDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pTxBuffer, uint32_t Le
     return state;
 }
 
+//Receive data with Interrupt
 uint8_t SSI_ReceiveDataIT(SSI_Handle_t *pSSIHandle, uint8_t *pRxBuffer, uint32_t Len)
 {
     uint8_t state = pSSIHandle->RxState;
